@@ -353,6 +353,108 @@ header p {
     opacity: 0.5;
 }
 
+/* Player Selection Modal */
+.player-selection {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.player-mode-btn {
+    flex: 1;
+    padding: 30px 20px;
+    background: linear-gradient(145deg, #2d6e3f, #1a4d2e);
+    border: 3px solid #4a7c4a;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: white;
+    text-align: center;
+}
+
+.player-mode-btn:hover {
+    transform: translateY(-5px);
+    border-color: #ffd700;
+    box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+    background: linear-gradient(145deg, #3a7d3a, #2d5f2d);
+}
+
+.mode-icon {
+    font-size: 3em;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.player-mode-btn h3 {
+    color: #ffd700;
+    margin: 10px 0;
+    font-size: 1.5em;
+}
+
+.player-mode-btn p {
+    margin: 10px 0;
+    font-size: 1.1em;
+}
+
+.player-mode-btn small {
+    color: #ccc;
+    font-size: 0.9em;
+}
+
+/* Card Animation */
+@keyframes dealCard {
+    0% {
+        transform: translate(-50%, -200px) scale(0.5) rotate(0deg);
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+@keyframes flipCard {
+    0% {
+        transform: rotateY(0deg);
+    }
+    50% {
+        transform: rotateY(90deg);
+    }
+    100% {
+        transform: rotateY(0deg);
+    }
+}
+
+.card.dealing {
+    animation: dealCard 0.5s ease-out forwards;
+}
+
+.card.flipping {
+    animation: flipCard 0.6s ease-in-out;
+}
+
+/* Dealing Status */
+.dealing-status {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: #ffd700;
+    padding: 30px 50px;
+    border-radius: 15px;
+    font-size: 1.5em;
+    font-weight: bold;
+    z-index: 2000;
+    border: 3px solid #ffd700;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+    display: none;
+}
+
 /* Modal Tutorial */
 .modal {
     display: none;
@@ -435,6 +537,7 @@ header p {
     
     .score-board {
         gap: 20px;
+        flex-direction: column;
     }
     
     .pile-container {
@@ -453,6 +556,14 @@ header p {
     }
     
     .btn {
+        width: 100%;
+    }
+    
+    .player-selection {
+        flex-direction: column;
+    }
+    
+    .player-mode-btn {
         width: 100%;
     }
 }

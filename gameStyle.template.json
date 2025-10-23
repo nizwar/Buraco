@@ -1,0 +1,78 @@
+{
+  "_comment": "TEMPLATE FILE - Data aktual disimpan di localStorage browser",
+  "_usage": "File ini hanya sebagai referensi struktur data. Game otomatis menyimpan ke localStorage",
+  
+  "version": "1.0",
+  "lastUpdated": "2025-10-23",
+  
+  "playerProfile": {
+    "gamesPlayed": 0,
+    "totalMoves": 0,
+    
+    "style": {
+      "aggressiveness": 50,
+      "riskTolerance": 50,
+      "meldSpeed": 50,
+      "wildCardUsage": 50,
+      "_description": "Nilai 0-100 yang merepresentasikan karakteristik bermain"
+    },
+    
+    "preferences": {
+      "prefersSequences": 0,
+      "prefersSets": 0,
+      "usesWildCardsEarly": 0,
+      "holdsForBigMelds": 0,
+      "_description": "Counter untuk tracking preferensi pemain"
+    },
+    
+    "patterns": {
+      "drawFromDiscard": 0,
+      "drawFromDeck": 0,
+      "avgMeldSize": 0,
+      "avgTurnsBeforeFirstMeld": 0,
+      "avgCardsInHandBeforeMeld": 0,
+      "_description": "Pattern bermain yang terdeteksi"
+    },
+    
+    "discardPatterns": {
+      "highCards": 0,
+      "lowCards": 0,
+      "middleCards": 0,
+      "duplicates": 0,
+      "isolatedCards": 0,
+      "_description": "Pattern kartu yang dibuang"
+    }
+  },
+  
+  "aiAdaptation": {
+    "currentStrategy": "balanced",
+    "adaptationLevel": 0,
+    
+    "counterStrategies": {
+      "againstAggressive": false,
+      "againstConservative": false,
+      "againstRisky": false,
+      "againstCautious": false,
+      "_description": "Flag untuk strategi counter yang aktif"
+    },
+    
+    "learningProgress": {
+      "movesAnalyzed": 0,
+      "patternsDetected": 0,
+      "confidenceLevel": 0,
+      "_description": "Progress pembelajaran AI (0-100)"
+    }
+  },
+  
+  "statistics": {
+    "wins": 0,
+    "losses": 0,
+    "draws": 0,
+    "avgScore": 0,
+    "highestScore": 0,
+    "totalBuracosCreated": 0,
+    "cleanBuracosCreated": 0,
+    "dirtyBuracosCreated": 0,
+    "_description": "Statistik game pemain"
+  }
+}

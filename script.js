@@ -2,18 +2,106 @@
 let gameState = {
     playerHand: [],
     computerHand: [],
+    computer2Hand: [],
+    computer3Hand: [],
     playerMelds: [],
     computerMelds: [],
+    computer2Melds: [],
+    computer3Melds: [],
     deck: [],
     discardPile: [],
-    pot: [],
+    playerPot: [],
+    computerPot: [],
+    computer2Pot: [],
+    computer3Pot: [],
     playerScore: 0,
     computerScore: 0,
+    computer2Score: 0,
+    computer3Score: 0,
+    playerRoundScore: 0,
+    computerRoundScore: 0,
+    computer2RoundScore: 0,
+    computer3RoundScore: 0,
+    playerHasBuraco: false,
+    computerHasBuraco: false,
+    computer2HasBuraco: false,
+    computer3HasBuraco: false,
+    playerFirstMeldMade: false,
+    computerFirstMeldMade: false,
+    computer2FirstMeldMade: false,
+    computer3FirstMeldMade: false,
     currentTurn: 'player',
     hasDrawn: false,
     playerUsedPot: false,
     computerUsedPot: false,
-    selectedCards: []
+    computer2UsedPot: false,
+    computer3UsedPot: false,
+    selectedCards: [],
+    targetScore: 2000,
+    roundNumber: 1,
+    playerCount: 2,
+    isDealing: false
+};
+
+// Player Style Tracking
+let playerStyleData = {
+    version: "1.0",
+    lastUpdated: new Date().toISOString().split('T')[0],
+    playerProfile: {
+        gamesPlayed: 0,
+        totalMoves: 0,
+        style: {
+            aggressiveness: 50,
+            riskTolerance: 50,
+            meldSpeed: 50,
+            wildCardUsage: 50
+        },
+        preferences: {
+            prefersSequences: 0,
+            prefersSets: 0,
+            usesWildCardsEarly: 0,
+            holdsForBigMelds: 0
+        },
+        patterns: {
+            drawFromDiscard: 0,
+            drawFromDeck: 0,
+            avgMeldSize: 0,
+            avgTurnsBeforeFirstMeld: 0,
+            avgCardsInHandBeforeMeld: 0
+        },
+        discardPatterns: {
+            highCards: 0,
+            lowCards: 0,
+            middleCards: 0,
+            duplicates: 0,
+            isolatedCards: 0
+        }
+    },
+    aiAdaptation: {
+        currentStrategy: "balanced",
+        adaptationLevel: 0,
+        counterStrategies: {
+            againstAggressive: false,
+            againstConservative: false,
+            againstRisky: false,
+            againstCautious: false
+        },
+        learningProgress: {
+            movesAnalyzed: 0,
+            patternsDetected: 0,
+            confidenceLevel: 0
+        }
+    },
+    statistics: {
+        wins: 0,
+        losses: 0,
+        draws: 0,
+        avgScore: 0,
+        highestScore: 0,
+        totalBuracosCreated: 0,
+        cleanBuracosCreated: 0,
+        dirtyBuracosCreated: 0
+    }
 };
 
 // Card Suits and Values
@@ -24,31 +112,71 @@ const cardPoints = {
     '9': 10, '8': 10, '7': 5, '6': 5, '5': 5, '4': 5, '3': 5, '2': 20, 'JOKER': 50
 };
 
-// Initialize Game
-function initGame() {
+// Initialize Game (New Round)
+async function initGame(newGame = true, playerCount = 2) {
+    const keepScores = !newGame;
+    const previousPlayerScore = keepScores ? gameState.playerScore : 0;
+    const previousComputerScore = keepScores ? gameState.computerScore : 0;
+    const previousComputer2Score = keepScores ? gameState.computer2Score : 0;
+    const previousComputer3Score = keepScores ? gameState.computer3Score : 0;
+    const previousRoundNumber = keepScores ? gameState.roundNumber : 1;
+    const previousPlayerCount = keepScores ? gameState.playerCount : playerCount;
+    
     gameState = {
         playerHand: [],
         computerHand: [],
+        computer2Hand: [],
+        computer3Hand: [],
         playerMelds: [],
         computerMelds: [],
+        computer2Melds: [],
+        computer3Melds: [],
         deck: [],
         discardPile: [],
-        pot: [],
-        playerScore: 0,
-        computerScore: 0,
+        playerPot: [],
+        computerPot: [],
+        computer2Pot: [],
+        computer3Pot: [],
+        playerScore: previousPlayerScore,
+        computerScore: previousComputerScore,
+        computer2Score: previousComputer2Score,
+        computer3Score: previousComputer3Score,
+        playerRoundScore: 0,
+        computerRoundScore: 0,
+        computer2RoundScore: 0,
+        computer3RoundScore: 0,
+        playerHasBuraco: false,
+        computerHasBuraco: false,
+        computer2HasBuraco: false,
+        computer3HasBuraco: false,
+        playerFirstMeldMade: false,
+        computerFirstMeldMade: false,
+        computer2FirstMeldMade: false,
+        computer3FirstMeldMade: false,
         currentTurn: 'player',
         hasDrawn: false,
         playerUsedPot: false,
         computerUsedPot: false,
-        selectedCards: []
+        computer2UsedPot: false,
+        computer3UsedPot: false,
+        selectedCards: [],
+        targetScore: 2000,
+        roundNumber: previousRoundNumber,
+        playerCount: previousPlayerCount,
+        isDealing: false
     };
     
     createDeck();
     shuffleDeck();
-    dealCards();
+    await dealCards();
     updateUI();
     updateStatus('Giliran Anda! Ambil kartu dari deck atau tumpukan buang.');
     enableButtons();
+}
+
+// Show player selection modal
+function showPlayerSelection() {
+    document.getElementById('playerSelectModal').style.display = 'block';
 }
 
 // Create Deck (2 decks + 4 jokers)
@@ -90,21 +218,65 @@ function shuffleDeck() {
     }
 }
 
-// Deal Cards
-function dealCards() {
-    // Deal 11 cards to each player
+// Deal Cards with Animation
+async function dealCards() {
+    gameState.isDealing = true;
+    const dealingStatus = document.getElementById('dealingStatus');
+    dealingStatus.style.display = 'block';
+    dealingStatus.textContent = '🎴 Membagikan kartu...';
+    
+    // Disable all buttons during dealing
+    document.getElementById('startBtn').disabled = true;
+    document.getElementById('drawBtn').disabled = true;
+    document.getElementById('meldBtn').disabled = true;
+    document.getElementById('addToMeldBtn').disabled = true;
+    document.getElementById('discardBtn').disabled = true;
+    
+    const players = gameState.playerCount === 2 ? 
+        ['player', 'computer'] : 
+        ['player', 'computer', 'computer2', 'computer3'];
+    
+    // Deal 11 cards to each player with animation
     for (let i = 0; i < 11; i++) {
-        gameState.playerHand.push(gameState.deck.pop());
-        gameState.computerHand.push(gameState.deck.pop());
+        for (let player of players) {
+            await dealCardWithAnimation(player);
+            await sleep(100); // Delay between each card
+        }
     }
     
-    // Create pot (11 cards for each player)
-    for (let i = 0; i < 22; i++) {
-        gameState.pot.push(gameState.deck.pop());
+    dealingStatus.textContent = '🎁 Membuat pot...';
+    await sleep(500);
+    
+    // Create separate pots (11 cards for each player)
+    for (let player of players) {
+        for (let i = 0; i < 11; i++) {
+            gameState[`${player}Pot`].push(gameState.deck.pop());
+        }
     }
     
     // First discard
     gameState.discardPile.push(gameState.deck.pop());
+    
+    dealingStatus.textContent = '✅ Selesai! Selamat bermain!';
+    await sleep(1000);
+    dealingStatus.style.display = 'none';
+    gameState.isDealing = false;
+}
+
+// Deal single card with animation
+async function dealCardWithAnimation(player) {
+    const card = gameState.deck.pop();
+    gameState[`${player}Hand`].push(card);
+    
+    // Update UI with animation
+    updateUIWithAnimation();
+    
+    return new Promise(resolve => setTimeout(resolve, 50));
+}
+
+// Sleep helper function
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // Draw Card
@@ -114,10 +286,15 @@ function drawCard() {
             const card = gameState.deck.pop();
             gameState.playerHand.push(card);
             gameState.hasDrawn = true;
+            
+            // 📊 Track player draw choice
+            trackDrawChoice(false);
+            
             updateUI();
             updateStatus('Kartu diambil! Sekarang buat kombinasi atau buang kartu.');
             document.getElementById('drawBtn').disabled = true;
             document.getElementById('meldBtn').disabled = false;
+            document.getElementById('addToMeldBtn').disabled = false;
             document.getElementById('discardBtn').disabled = false;
         } else {
             updateStatus('Deck habis! Ambil pot jika belum diambil.');
@@ -125,31 +302,39 @@ function drawCard() {
     }
 }
 
-// Take from Discard Pile
+// Take from Discard Pile (Take ALL cards from discard pile)
 function takeFromDiscard() {
     if (!gameState.hasDrawn && gameState.discardPile.length > 0) {
-        const card = gameState.discardPile.pop();
-        gameState.playerHand.push(card);
+        // Take ALL cards from discard pile
+        const takenCards = [...gameState.discardPile];
+        gameState.playerHand.push(...takenCards);
+        gameState.discardPile = [];
         gameState.hasDrawn = true;
+        
+        // 📊 Track player draw choice
+        trackDrawChoice(true);
+        
         updateUI();
-        updateStatus('Kartu dari tumpukan buang diambil! Buat kombinasi atau buang kartu.');
+        updateStatus(`${takenCards.length} kartu dari tumpukan buang diambil! Buat kombinasi atau buang kartu.`);
         document.getElementById('drawBtn').disabled = true;
         document.getElementById('meldBtn').disabled = false;
+        document.getElementById('addToMeldBtn').disabled = false;
         document.getElementById('discardBtn').disabled = false;
     }
 }
 
 // Take Pot
 function takePot() {
-    if (!gameState.playerUsedPot && gameState.pot.length > 0 && gameState.playerHand.length === 0) {
-        // Take 11 cards from pot
-        for (let i = 0; i < 11 && gameState.pot.length > 0; i++) {
-            gameState.playerHand.push(gameState.pot.pop());
-        }
+    if (!gameState.playerUsedPot && gameState.playerPot.length > 0 && gameState.playerHand.length === 0) {
+        // Take player's pot
+        gameState.playerHand.push(...gameState.playerPot);
+        gameState.playerPot = [];
         gameState.playerUsedPot = true;
+        gameState.hasDrawn = false;
         updateUI();
-        updateStatus('Pot diambil! Lanjutkan permainan.');
+        updateStatus('Pot Anda diambil! Lanjutkan permainan.');
         document.getElementById('takePotBtn').disabled = true;
+        enableButtons();
     }
 }
 
@@ -201,6 +386,19 @@ function makeMeld() {
         
         gameState.playerScore += meldPoints;
         gameState.selectedCards = [];
+        
+        // 📊 Track player meld creation
+        trackMeldCreation(meld);
+        
+        // 📊 Track Buraco if created
+        if (meld.length >= 7) {
+            const hasWild = meld.some(c => c.isWild);
+            trackBuracoCreation(!hasWild);
+            if (!gameState.playerHasBuraco) {
+                gameState.playerHasBuraco = true;
+            }
+        }
+        
         updateUI();
         updateStatus('Kombinasi berhasil dibuat! ' + getMeldDescription(meld) + ` +${meldPoints} poin!`);
     } else {
@@ -260,9 +458,9 @@ function getMeldDescription(meld) {
     
     if (meld.length >= 7) {
         if (isClean) {
-            return '🎉 BURACO! (Clean Run) +200 poin!';
+            return '🎉 BURACO! (Clean Run) +200 poin bonus!';
         } else {
-            return '✨ Dirty Run +100 poin!';
+            return '✨ Dirty Run (7+ kartu dengan wild) +100 poin bonus!';
         }
     }
     return 'Kombinasi valid!';
@@ -272,18 +470,32 @@ function getMeldDescription(meld) {
 function discardCard(index) {
     if (gameState.hasDrawn) {
         const card = gameState.playerHand.splice(index, 1)[0];
+        
+        // 📊 Track player discard choice
+        trackDiscardChoice(card);
+        
         gameState.discardPile.push(card);
         gameState.hasDrawn = false;
         gameState.selectedCards = [];
         
         // Check if player finished
         if (gameState.playerHand.length === 0) {
-            if (!gameState.playerUsedPot && gameState.pot.length > 0) {
+            if (!gameState.playerUsedPot && gameState.playerPot.length > 0) {
                 takePot();
                 return;
             } else {
-                endRound();
-                return;
+                // Check if player can finish (must have at least 1 Buraco)
+                if (gameState.playerHasBuraco) {
+                    endRound();
+                    return;
+                } else {
+                    updateStatus('ERROR: Tidak bisa menghabiskan kartu tanpa Buraco!');
+                    gameState.playerHand.push(card);
+                    gameState.discardPile.pop();
+                    gameState.hasDrawn = true;
+                    updateUI();
+                    return;
+                }
             }
         }
         
@@ -291,6 +503,7 @@ function discardCard(index) {
         updateStatus('Giliran komputer...');
         document.getElementById('drawBtn').disabled = true;
         document.getElementById('meldBtn').disabled = true;
+        document.getElementById('addToMeldBtn').disabled = true;
         document.getElementById('discardBtn').disabled = true;
         
         setTimeout(computerTurn, 1500);
@@ -303,30 +516,70 @@ function discardCard(index) {
 function computerTurn() {
     gameState.currentTurn = 'computer';
     
-    // Draw card
-    if (gameState.deck.length > 0) {
-        gameState.computerHand.push(gameState.deck.pop());
+    // Smart decision: Should take from discard pile or deck?
+    const shouldTakeDiscard = computerShouldTakeDiscardPile();
+    
+    if (shouldTakeDiscard && gameState.discardPile.length > 0) {
+        // Take entire discard pile
+        gameState.computerHand.push(...gameState.discardPile);
+        updateStatus('Komputer mengambil seluruh tumpukan buang! 📥');
+        gameState.discardPile = [];
+        updateUI();
+    } else {
+        // Draw from deck
+        if (gameState.deck.length > 0) {
+            gameState.computerHand.push(gameState.deck.pop());
+        } else if (gameState.discardPile.length > 0) {
+            // If deck is empty, must take from discard pile
+            gameState.computerHand.push(...gameState.discardPile);
+            gameState.discardPile = [];
+        }
     }
     
     // Try to make melds
+    const meldsBefore = gameState.computerMelds.length;
     computerMakeMelds();
+    const meldsAfter = gameState.computerMelds.length;
     
-    // Discard
+    if (meldsAfter > meldsBefore) {
+        updateStatus('💡 Komputer membuat kombinasi baru!');
+        updateUI();
+        setTimeout(() => {}, 500);
+    }
+    
+    // Try to add to existing melds
+    const cardsBefore = gameState.computerHand.length;
+    computerAddToExistingMelds();
+    const cardsAfter = gameState.computerHand.length;
+    
+    if (cardsAfter < cardsBefore) {
+        updateStatus('➕ Komputer menambahkan kartu ke kombinasi!');
+        updateUI();
+        setTimeout(() => {}, 500);
+    }
+    
+    // Smart discard: discard least useful card
     if (gameState.computerHand.length > 0) {
-        const discardIndex = Math.floor(Math.random() * gameState.computerHand.length);
+        const discardIndex = computerChooseDiscardCard();
+        const discardedCard = gameState.computerHand[discardIndex];
         gameState.discardPile.push(gameState.computerHand.splice(discardIndex, 1)[0]);
+        
+        if (discardedCard.points >= 15) {
+            updateStatus(`🎯 Komputer membuang ${discardedCard.displayValue} (${discardedCard.points} poin)`);
+        }
     }
     
     // Check if computer finished
     if (gameState.computerHand.length === 0) {
-        if (!gameState.computerUsedPot && gameState.pot.length > 0) {
-            for (let i = 0; i < 11 && gameState.pot.length > 0; i++) {
-                gameState.computerHand.push(gameState.pot.pop());
-            }
+        if (!gameState.computerUsedPot && gameState.computerPot.length > 0) {
+            gameState.computerHand.push(...gameState.computerPot);
+            gameState.computerPot = [];
             gameState.computerUsedPot = true;
         } else {
-            endRound();
-            return;
+            if (gameState.computerHasBuraco) {
+                endRound();
+                return;
+            }
         }
     }
     
@@ -336,55 +589,360 @@ function computerTurn() {
     enableButtons();
 }
 
-// Computer Make Melds (Simple AI)
-function computerMakeMelds() {
+// AI: Decide if computer should take discard pile
+function computerShouldTakeDiscardPile() {
+    if (gameState.discardPile.length === 0) return false;
+    
+    const topCard = gameState.discardPile[gameState.discardPile.length - 1];
+    const pileSize = gameState.discardPile.length;
+    
+    // 🤖 Get AI-adapted thresholds based on player style
+    const baseThreshold80 = getAIAdaptedThreshold(80);
+    const baseThreshold60 = getAIAdaptedThreshold(60);
+    const baseThreshold40 = getAIAdaptedThreshold(40);
+    const baseThreshold50 = getAIAdaptedThreshold(50);
+    const baseThreshold30 = getAIAdaptedThreshold(30);
+    
+    // Strategy 1: If top card can complete a meld
+    if (computerCanUseCard(topCard)) {
+        // More likely to take if pile is small (1-3 cards)
+        if (pileSize <= 3) return Math.random() * 100 < baseThreshold80;
+        // Medium pile (4-7 cards)
+        if (pileSize <= 7) return Math.random() * 100 < baseThreshold60;
+        // Large pile (8+ cards) - be cautious
+        return Math.random() * 100 < baseThreshold40;
+    }
+    
+    // Strategy 2: If pile is small and top card is useful
+    if (pileSize <= 2 && (topCard.isWild || topCard.points <= 5)) {
+        return Math.random() * 100 < baseThreshold50;
+    }
+    
+    // Strategy 3: Desperate mode - if hand is bad and pile is reasonable
+    const handQuality = evaluateHandQuality(gameState.computerHand);
+    if (handQuality < 30 && pileSize <= 5) {
+        return Math.random() * 100 < baseThreshold30;
+    }
+    
+    return false; // Default: don't take
+}
+
+// AI: Check if computer can use a card
+function computerCanUseCard(card) {
+    const hand = gameState.computerHand;
+    
+    // Check if card completes a set (same value)
+    if (!card.isWild) {
+        const sameValueCount = hand.filter(c => c.value === card.value).length;
+        if (sameValueCount >= 2) return true; // Would make a set of 3+
+    }
+    
+    // Check if card completes a sequence
+    if (!card.isWild) {
+        const sameSuitCards = hand.filter(c => c.suit === card.suit && !c.isWild);
+        if (sameSuitCards.length >= 2) {
+            // Check if forms sequence
+            const valueOrder = ['A', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+            const cardIndex = valueOrder.indexOf(card.value);
+            
+            for (let otherCard of sameSuitCards) {
+                const otherIndex = valueOrder.indexOf(otherCard.value);
+                const diff = Math.abs(cardIndex - otherIndex);
+                if (diff <= 2) return true; // Close enough for sequence
+            }
+        }
+    }
+    
+    // Wild cards are always useful
+    if (card.isWild) return true;
+    
+    return false;
+}
+
+// AI: Evaluate hand quality (0-100)
+function evaluateHandQuality(hand) {
+    let quality = 0;
+    
+    // Count potential melds
+    const valueCounts = {};
+    hand.forEach(card => {
+        if (!valueCounts[card.value]) valueCounts[card.value] = 0;
+        valueCounts[card.value]++;
+    });
+    
+    // Pairs and sets add quality
+    for (let value in valueCounts) {
+        if (valueCounts[value] >= 3) quality += 30;
+        else if (valueCounts[value] === 2) quality += 15;
+    }
+    
+    // Wild cards add quality
+    const wildCount = hand.filter(c => c.isWild).length;
+    quality += wildCount * 10;
+    
+    return Math.min(quality, 100);
+}
+
+// AI: Choose best card to discard
+function computerChooseDiscardCard() {
+    const hand = gameState.computerHand;
+    if (hand.length === 1) return 0;
+    
+    let worstIndex = 0;
+    let worstScore = -1000;
+    
+    for (let i = 0; i < hand.length; i++) {
+        const card = hand[i];
+        let score = 0;
+        
+        // Don't discard wild cards
+        if (card.isWild) {
+            score = -100;
+        } else {
+            // Check if card is part of potential meld
+            const sameValueCount = hand.filter(c => c.value === card.value).length;
+            if (sameValueCount >= 2) {
+                score = -50; // Keep cards that can form sets
+            }
+            
+            // Check if card can form sequence
+            const sameSuitCards = hand.filter(c => c.suit === card.suit && !c.isWild);
+            if (sameSuitCards.length >= 2) {
+                score = -30; // Keep cards that might form sequences
+            }
+            
+            // High value cards are worse to keep (higher penalty if discarded)
+            score += card.points;
+        }
+        
+        if (score > worstScore) {
+            worstScore = score;
+            worstIndex = i;
+        }
+    }
+    
+    return worstIndex;
+}
+
+// AI: Try to add cards to existing melds
+function computerAddToExistingMelds() {
+    if (gameState.computerMelds.length === 0) return;
+    
     let changed = true;
     while (changed) {
         changed = false;
         
-        // Try to find sets
-        const valueCounts = {};
-        gameState.computerHand.forEach((card, index) => {
-            if (!valueCounts[card.value]) valueCounts[card.value] = [];
-            valueCounts[card.value].push(index);
-        });
-        
-        for (let value in valueCounts) {
-            if (valueCounts[value].length >= 3 && value !== '2' && value !== 'JOKER') {
-                const meld = [];
-                for (let i = 0; i < 3; i++) {
-                    const index = valueCounts[value][i];
-                    meld.push(gameState.computerHand[index]);
+        for (let meldIndex = 0; meldIndex < gameState.computerMelds.length; meldIndex++) {
+            const meld = gameState.computerMelds[meldIndex];
+            
+            for (let i = gameState.computerHand.length - 1; i >= 0; i--) {
+                const card = gameState.computerHand[i];
+                const testMeld = [...meld, card];
+                
+                if (isValidMeld(testMeld)) {
+                    // Add card to meld
+                    const addedCard = gameState.computerHand.splice(i, 1)[0];
+                    meld.push(addedCard);
+                    
+                    // Calculate points
+                    let addedPoints = addedCard.points;
+                    
+                    // Check if this makes it a Buraco
+                    if (meld.length >= 7) {
+                        const hasWild = meld.some(c => c.isWild);
+                        if (!hasWild && !gameState.computerHasBuraco) {
+                            addedPoints += 200;
+                            gameState.computerHasBuraco = true;
+                        } else if (hasWild && meld.length === 7) {
+                            addedPoints += 100;
+                        }
+                    }
+                    
+                    gameState.computerRoundScore += addedPoints;
+                    changed = true;
+                    break;
                 }
-                // Remove from hand
-                valueCounts[value].slice(0, 3).reverse().forEach(index => {
-                    gameState.computerHand.splice(index, 1);
-                });
-                gameState.computerMelds.push(meld);
-                
-                // Calculate and add points immediately
-                let meldPoints = 0;
-                meld.forEach(card => {
-                    meldPoints += card.points;
-                });
-                
-                // Bonus for Buraco and Dirty Run
-                if (meld.length >= 7) {
-                    const hasWild = meld.some(c => c.isWild);
-                    if (hasWild) {
-                        meldPoints += 100; // Dirty Run
-                    } else {
-                        meldPoints += 200; // Buraco (Clean Run)
+            }
+            
+            if (changed) break;
+        }
+    }
+}
+
+// Computer Make Melds (Improved AI)
+function computerMakeMelds() {
+    let changed = true;
+    let attempts = 0;
+    const maxAttempts = 10; // Prevent infinite loops
+    
+    while (changed && attempts < maxAttempts) {
+        changed = false;
+        attempts++;
+        
+        // Strategy 1: Try to find the best meld (prioritize longer melds and sequences)
+        const bestMeld = computerFindBestMeld();
+        
+        if (bestMeld && bestMeld.cards.length >= 3) {
+            // Calculate meld points
+            let meldPoints = 0;
+            bestMeld.cards.forEach(card => {
+                meldPoints += card.points;
+            });
+            
+            // Check minimum requirement for first meld
+            if (!gameState.computerFirstMeldMade) {
+                if (meldPoints < 50) {
+                    // Try to add wild cards to reach 50 points
+                    const wildCards = gameState.computerHand.filter(c => c.isWild);
+                    if (wildCards.length > 0 && isValidMeld([...bestMeld.cards, wildCards[0]])) {
+                        bestMeld.cards.push(wildCards[0]);
+                        meldPoints += wildCards[0].points;
+                    }
+                    
+                    if (meldPoints < 50) {
+                        continue; // Still not enough, skip this meld
                     }
                 }
+                gameState.computerFirstMeldMade = true;
+            }
+            
+            // Remove cards from hand
+            const meldToAdd = [];
+            bestMeld.indices.sort((a, b) => b - a).forEach(index => {
+                meldToAdd.unshift(gameState.computerHand.splice(index, 1)[0]);
+            });
+            
+            gameState.computerMelds.push(meldToAdd);
+            
+            // Bonus for Buraco and Dirty Run
+            if (meldToAdd.length >= 7) {
+                const hasWild = meldToAdd.some(c => c.isWild);
+                if (hasWild) {
+                    meldPoints += 100; // Dirty Run
+                } else {
+                    meldPoints += 200; // Buraco (Clean Run)
+                    gameState.computerHasBuraco = true;
+                }
+            }
+            
+            gameState.computerRoundScore += meldPoints;
+            changed = true;
+        }
+    }
+}
+
+// AI: Find the best possible meld in hand
+function computerFindBestMeld() {
+    const hand = gameState.computerHand;
+    let bestMeld = null;
+    let bestScore = 0;
+    
+    // Try to find sets (same value)
+    const valueCounts = {};
+    hand.forEach((card, index) => {
+        if (!valueCounts[card.value]) valueCounts[card.value] = { cards: [], indices: [] };
+        valueCounts[card.value].cards.push(card);
+        valueCounts[card.value].indices.push(index);
+    });
+    
+    for (let value in valueCounts) {
+        if (value === '2' || value === 'JOKER') continue; // Skip wild cards for sets
+        
+        const group = valueCounts[value];
+        if (group.cards.length >= 3) {
+            // Calculate score: prefer longer sets
+            const score = group.cards.length * 20 + group.cards.reduce((sum, c) => sum + c.points, 0);
+            
+            if (score > bestScore) {
+                bestScore = score;
+                bestMeld = {
+                    cards: [...group.cards],
+                    indices: [...group.indices],
+                    type: 'set'
+                };
+            }
+        } else if (group.cards.length === 2) {
+            // Try to add a wild card
+            const wildIndex = hand.findIndex(c => c.isWild);
+            if (wildIndex >= 0) {
+                const score = 3 * 15 + group.cards.reduce((sum, c) => sum + c.points, 0) + hand[wildIndex].points;
                 
-                gameState.computerScore += meldPoints;
-                
-                changed = true;
-                break;
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMeld = {
+                        cards: [...group.cards, hand[wildIndex]],
+                        indices: [...group.indices, wildIndex],
+                        type: 'set-with-wild'
+                    };
+                }
             }
         }
     }
+    
+    // Try to find sequences (same suit, consecutive)
+    const suitGroups = { '♠': [], '♥': [], '♦': [], '♣': [] };
+    hand.forEach((card, index) => {
+        if (!card.isWild && suitGroups[card.suit]) {
+            suitGroups[card.suit].push({ card, index });
+        }
+    });
+    
+    const valueOrder = ['A', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+    
+    for (let suit in suitGroups) {
+        const cards = suitGroups[suit];
+        if (cards.length < 2) continue;
+        
+        // Sort by value
+        cards.sort((a, b) => {
+            return valueOrder.indexOf(a.card.value) - valueOrder.indexOf(b.card.value);
+        });
+        
+        // Find longest sequence
+        for (let i = 0; i < cards.length; i++) {
+            const sequence = [cards[i]];
+            let lastValue = valueOrder.indexOf(cards[i].card.value);
+            
+            for (let j = i + 1; j < cards.length; j++) {
+                const currentValue = valueOrder.indexOf(cards[j].card.value);
+                const gap = currentValue - lastValue;
+                
+                if (gap === 1) {
+                    // Consecutive
+                    sequence.push(cards[j]);
+                    lastValue = currentValue;
+                } else if (gap === 2) {
+                    // One card gap - can use wild
+                    const wildIndex = hand.findIndex(c => c.isWild);
+                    if (wildIndex >= 0 && sequence.length + 1 >= 3) {
+                        sequence.push({ card: hand[wildIndex], index: wildIndex });
+                        sequence.push(cards[j]);
+                        lastValue = currentValue;
+                    } else {
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+            
+            if (sequence.length >= 3) {
+                // Prefer longer sequences
+                const score = sequence.length * 25 + sequence.reduce((sum, item) => sum + item.card.points, 0);
+                
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMeld = {
+                        cards: sequence.map(item => item.card),
+                        indices: sequence.map(item => item.index),
+                        type: 'sequence'
+                    };
+                }
+            }
+        }
+    }
+    
+    return bestMeld;
 }
 
 // End Round
@@ -400,36 +958,78 @@ function endRound() {
         computerPenalty += card.points;
     });
     
-    // Subtract penalties from scores
-    gameState.playerScore -= playerPenalty;
-    gameState.computerScore -= computerPenalty;
+    // Apply round scores and penalties
+    const playerFinalRoundScore = gameState.playerRoundScore - playerPenalty;
+    const computerFinalRoundScore = gameState.computerRoundScore - computerPenalty;
+    
+    gameState.playerScore += playerFinalRoundScore;
+    gameState.computerScore += computerFinalRoundScore;
     
     updateUI();
     
-    let message = `Ronde Selesai!\n\n`;
+    let message = `🏁 Ronde ${gameState.roundNumber} Selesai!\n\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `📊 ANDA:\n`;
+    message += `  Poin dari kombinasi: +${gameState.playerRoundScore}\n`;
     if (playerPenalty > 0) {
-        message += `Penalti kartu tersisa Anda: -${playerPenalty} poin\n`;
+        message += `  Penalti kartu tersisa: -${playerPenalty}\n`;
     }
+    message += `  Poin ronde ini: ${playerFinalRoundScore > 0 ? '+' : ''}${playerFinalRoundScore}\n`;
+    message += `  Total Skor: ${gameState.playerScore}\n\n`;
+    
+    message += `💻 KOMPUTER:\n`;
+    message += `  Poin dari kombinasi: +${gameState.computerRoundScore}\n`;
     if (computerPenalty > 0) {
-        message += `Penalti kartu tersisa Komputer: -${computerPenalty} poin\n`;
+        message += `  Penalti kartu tersisa: -${computerPenalty}\n`;
     }
-    message += `\nTotal Skor Anda: ${gameState.playerScore}\n`;
-    message += `Total Skor Komputer: ${gameState.computerScore}\n\n`;
+    message += `  Poin ronde ini: ${computerFinalRoundScore > 0 ? '+' : ''}${computerFinalRoundScore}\n`;
+    message += `  Total Skor: ${gameState.computerScore}\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━\n\n`;
     
-    if (gameState.playerScore > gameState.computerScore) {
-        message += `🎉 Anda Menang!`;
-    } else if (gameState.computerScore > gameState.playerScore) {
-        message += `💻 Komputer Menang!`;
-    } else {
-        message += `🤝 Seri!`;
-    }
-    
-    setTimeout(() => {
-        alert(message);
-        if (confirm('Mulai ronde baru?')) {
-            initGame();
+    // Check if game is won
+    if (gameState.playerScore >= gameState.targetScore || gameState.computerScore >= gameState.targetScore) {
+        const playerWon = gameState.playerScore > gameState.computerScore;
+        const isDraw = gameState.playerScore === gameState.computerScore;
+        
+        // 📊 Track game result
+        trackGameResult(playerWon, gameState.playerScore);
+        
+        if (playerWon) {
+            message += `🎉🎊 ANDA MENANG GAME! 🎊🎉\n`;
+            message += `Skor Akhir: ${gameState.playerScore} vs ${gameState.computerScore}`;
+        } else if (!isDraw) {
+            message += `💻 Komputer Menang Game!\n`;
+            message += `Skor Akhir: ${gameState.computerScore} vs ${gameState.playerScore}`;
+        } else {
+            message += `🤝 SERI! Game berakhir imbang!\n`;
+            message += `Skor Akhir: ${gameState.playerScore} - ${gameState.computerScore}`;
         }
-    }, 500);
+        
+        setTimeout(() => {
+            alert(message);
+            if (confirm('Mulai game baru?')) {
+                initGame(true); // New game, reset all scores
+            }
+        }, 500);
+    } else {
+        // Continue to next round
+        message += `Target: ${gameState.targetScore} poin\n`;
+        if (gameState.playerScore > gameState.computerScore) {
+            message += `� Anda memimpin!\n`;
+        } else if (gameState.computerScore > gameState.playerScore) {
+            message += `Komputer memimpin!\n`;
+        } else {
+            message += `Skor seri!\n`;
+        }
+        
+        setTimeout(() => {
+            alert(message);
+            if (confirm('Lanjut ke ronde berikutnya?')) {
+                gameState.roundNumber++;
+                initGame(false); // Keep scores
+            }
+        }, 500);
+    }
 }
 
 // Calculate Score
@@ -465,8 +1065,9 @@ function calculateScore(melds, hand) {
 function enableButtons() {
     document.getElementById('drawBtn').disabled = false;
     document.getElementById('meldBtn').disabled = true;
+    document.getElementById('addToMeldBtn').disabled = true;
     document.getElementById('discardBtn').disabled = true;
-    document.getElementById('takePotBtn').disabled = gameState.playerUsedPot || gameState.playerHand.length > 0;
+    document.getElementById('takePotBtn').disabled = gameState.playerUsedPot || gameState.playerHand.length > 0 || gameState.playerPot.length === 0;
 }
 
 // Update Status
@@ -476,9 +1077,21 @@ function updateStatus(message) {
 
 // Update UI
 function updateUI() {
-    // Update scores
-    document.getElementById('playerScore').textContent = gameState.playerScore;
-    document.getElementById('computerScore').textContent = gameState.computerScore;
+    // Update scores (show round score + total score)
+    if (gameState.playerCount === 2) {
+        document.getElementById('playerScore').textContent = `${gameState.playerScore} (+${gameState.playerRoundScore})`;
+        document.getElementById('computerScore').textContent = `${gameState.computerScore} (+${gameState.computerRoundScore})`;
+    } else {
+        // 4 players: show team scores (player + computer2 vs computer + computer3)
+        const team1Score = gameState.playerScore + gameState.computer2Score;
+        const team2Score = gameState.computerScore + gameState.computer3Score;
+        const team1RoundScore = gameState.playerRoundScore + gameState.computer2RoundScore;
+        const team2RoundScore = gameState.computerRoundScore + gameState.computer3RoundScore;
+        document.getElementById('playerScore').textContent = `Tim 1: ${team1Score} (+${team1RoundScore})`;
+        document.getElementById('computerScore').textContent = `Tim 2: ${team2Score} (+${team2RoundScore})`;
+    }
+    document.getElementById('roundNumber').textContent = gameState.roundNumber;
+    document.getElementById('targetScore').textContent = gameState.targetScore;
     
     // Update player hand
     const playerHandEl = document.getElementById('playerHand');
@@ -487,6 +1100,10 @@ function updateUI() {
         const cardEl = createCardElement(card, true);
         if (gameState.selectedCards.includes(index)) {
             cardEl.classList.add('selected');
+        }
+        if (gameState.isDealing) {
+            cardEl.classList.add('dealing');
+            cardEl.style.animationDelay = `${index * 0.1}s`;
         }
         cardEl.onclick = () => toggleCardSelection(index);
         cardEl.ondblclick = () => {
@@ -500,10 +1117,14 @@ function updateUI() {
     // Update computer hand
     const computerHandEl = document.getElementById('computerHand');
     computerHandEl.innerHTML = '';
-    gameState.computerHand.forEach(() => {
+    gameState.computerHand.forEach((card, index) => {
         const cardEl = document.createElement('div');
         cardEl.className = 'card back';
         cardEl.textContent = '🂠';
+        if (gameState.isDealing) {
+            cardEl.classList.add('dealing');
+            cardEl.style.animationDelay = `${index * 0.1}s`;
+        }
         computerHandEl.appendChild(cardEl);
     });
     
@@ -526,12 +1147,14 @@ function updateUI() {
         drawPileEl.innerHTML = '<p>Kosong</p>';
     }
     
-    // Update pot
+    // Update pot (show player's pot status)
     const potPileEl = document.getElementById('potPile');
-    if (gameState.pot.length > 0) {
-        potPileEl.innerHTML = '<div class="card back">🎁</div>';
+    if (gameState.playerPot.length > 0) {
+        potPileEl.innerHTML = `<div class="card back">🎁</div><p style="color: #ffd700; font-size: 0.8em; margin-top: 5px;">${gameState.playerPot.length} kartu</p>`;
+    } else if (gameState.computerPot.length > 0) {
+        potPileEl.innerHTML = `<div class="card back" style="opacity: 0.5;">🎁</div><p style="color: #999; font-size: 0.8em; margin-top: 5px;">Pot lawan</p>`;
     } else {
-        potPileEl.innerHTML = '<p>Kosong</p>';
+        potPileEl.innerHTML = '<p style="color: #999;">Kosong</p>';
     }
     
     // Update melds
@@ -575,8 +1198,23 @@ function createCardElement(card, clickable) {
     return cardEl;
 }
 
+// Update UI with animation helper
+function updateUIWithAnimation() {
+    if (gameState.isDealing) {
+        updateUI();
+    }
+}
+
 // Event Listeners
-document.getElementById('startBtn').addEventListener('click', initGame);
+document.getElementById('startBtn').addEventListener('click', showPlayerSelection);
+document.getElementById('select2Players').addEventListener('click', () => {
+    document.getElementById('playerSelectModal').style.display = 'none';
+    initGame(true, 2);
+});
+document.getElementById('select4Players').addEventListener('click', () => {
+    document.getElementById('playerSelectModal').style.display = 'none';
+    initGame(true, 4);
+});
 document.getElementById('drawBtn').addEventListener('click', drawCard);
 document.getElementById('meldBtn').addEventListener('click', makeMeld);
 document.getElementById('discardBtn').addEventListener('click', () => {
@@ -587,6 +1225,33 @@ document.getElementById('discardBtn').addEventListener('click', () => {
     }
 });
 document.getElementById('takePotBtn').addEventListener('click', takePot);
+document.getElementById('addToMeldBtn').addEventListener('click', () => {
+    if (gameState.playerMelds.length === 0) {
+        updateStatus('Belum ada kombinasi untuk ditambahi!');
+        return;
+    }
+    if (gameState.selectedCards.length === 0) {
+        updateStatus('Pilih kartu yang ingin ditambahkan!');
+        return;
+    }
+    // For simplicity, add to first valid meld found
+    for (let i = 0; i < gameState.playerMelds.length; i++) {
+        const sortedIndices = [...gameState.selectedCards].sort((a, b) => a - b);
+        const selectedCards = sortedIndices.map(index => gameState.playerHand[index]);
+        const testMeld = [...gameState.playerMelds[i], ...selectedCards];
+        
+        if (isValidMeld(testMeld)) {
+            addToMeld(i);
+            return;
+        }
+    }
+    updateStatus('Kartu tidak bisa ditambahkan ke kombinasi manapun!');
+});
+
+// AI Learning Controls
+document.getElementById('viewStatsBtn').addEventListener('click', showPlayerStats);
+document.getElementById('downloadStyleBtn').addEventListener('click', downloadPlayerStyle);
+document.getElementById('resetStyleBtn').addEventListener('click', resetPlayerStyle);
 
 // Tutorial Modal
 const modal = document.getElementById('tutorialModal');
@@ -606,13 +1271,415 @@ closeTutorialBtn.onclick = () => {
     modal.style.display = 'none';
 };
 
+// Stats Modal
+const statsModal = document.getElementById('statsModal');
+const closeStats = document.getElementById('closeStats');
+const closeStatsBtn = document.getElementById('closeStatsBtn');
+
+closeStats.onclick = () => {
+    statsModal.style.display = 'none';
+};
+
+closeStatsBtn.onclick = () => {
+    statsModal.style.display = 'none';
+};
+
 window.onclick = (event) => {
     if (event.target === modal) {
         modal.style.display = 'none';
     }
+    if (event.target === statsModal) {
+        statsModal.style.display = 'none';
+    }
+    if (event.target === document.getElementById('playerSelectModal')) {
+        // Don't allow closing player select modal by clicking outside
+    }
 };
 
-// Show tutorial on first load
+// Show player selection on first load
 window.onload = () => {
-    modal.style.display = 'block';
+    loadPlayerStyle();
+    showPlayerSelection();
 };
+
+// ============================================
+// PLAYER STYLE TRACKING & AI LEARNING SYSTEM
+// ============================================
+
+// Load player style from gameStyle.json
+// Load player style from localStorage (NO FILE ACCESS - avoid CORS)
+function loadPlayerStyle() {
+    const saved = localStorage.getItem('buracoPlayerStyle');
+    if (saved) {
+        try {
+            playerStyleData = JSON.parse(saved);
+            console.log('✅ Loaded player style from localStorage:', playerStyleData);
+            updateAIStrategy();
+        } catch (e) {
+            console.error('Error loading player style:', e);
+            console.log('⚠️ Using default player style data');
+        }
+    } else {
+        console.log('📝 No saved data found. Starting fresh!');
+    }
+}
+
+// Save player style to localStorage (auto-save after every action)
+function savePlayerStyle() {
+    playerStyleData.lastUpdated = new Date().toISOString().split('T')[0];
+    
+    // Save to localStorage
+    localStorage.setItem('buracoPlayerStyle', JSON.stringify(playerStyleData));
+    
+    // Display current state in console for debugging
+    console.log('💾 Saved to localStorage');
+    console.log('📊 Stats:', {
+        gamesPlayed: playerStyleData.playerProfile.gamesPlayed,
+        totalMoves: playerStyleData.playerProfile.totalMoves,
+        aggressiveness: playerStyleData.playerProfile.style.aggressiveness.toFixed(1),
+        riskTolerance: playerStyleData.playerProfile.style.riskTolerance.toFixed(1),
+        aiStrategy: playerStyleData.aiAdaptation.currentStrategy,
+        confidence: playerStyleData.aiAdaptation.learningProgress.confidenceLevel.toFixed(1)
+    });
+    
+    // Show notification every 10 moves
+    if (playerStyleData.playerProfile.totalMoves % 10 === 0 && playerStyleData.playerProfile.totalMoves > 0) {
+        updateStatus(`📊 AI sedang mempelajari style Anda... (${playerStyleData.playerProfile.totalMoves} moves analyzed)`);
+    }
+}
+
+// Track when player draws a card
+function trackDrawChoice(fromDiscard) {
+    if (fromDiscard) {
+        playerStyleData.playerProfile.patterns.drawFromDiscard++;
+    } else {
+        playerStyleData.playerProfile.patterns.drawFromDeck++;
+    }
+    playerStyleData.playerProfile.totalMoves++;
+    
+    // Calculate risk tolerance (higher if often takes discard pile)
+    const total = playerStyleData.playerProfile.patterns.drawFromDiscard + 
+                  playerStyleData.playerProfile.patterns.drawFromDeck;
+    const discardRatio = playerStyleData.playerProfile.patterns.drawFromDiscard / total;
+    playerStyleData.playerProfile.style.riskTolerance = Math.min(100, discardRatio * 150);
+    
+    savePlayerStyle();
+}
+
+// Track when player creates a meld
+function trackMeldCreation(meld) {
+    const meldSize = meld.length;
+    
+    // Update average meld size
+    const currentAvg = playerStyleData.playerProfile.patterns.avgMeldSize;
+    const totalMelds = gameState.playerMelds.length;
+    playerStyleData.playerProfile.patterns.avgMeldSize = 
+        (currentAvg * (totalMelds - 1) + meldSize) / totalMelds;
+    
+    // Check if it's a sequence or set
+    const isSequence = checkIfSequence(meld);
+    if (isSequence) {
+        playerStyleData.playerProfile.preferences.prefersSequences++;
+    } else {
+        playerStyleData.playerProfile.preferences.prefersSets++;
+    }
+    
+    // Check for wild cards
+    const hasWildCards = meld.some(card => card.value === '2' || card.value === 'Joker');
+    if (hasWildCards) {
+        playerStyleData.playerProfile.preferences.usesWildCardsEarly++;
+        playerStyleData.playerProfile.style.wildCardUsage = Math.min(100, 
+            playerStyleData.playerProfile.style.wildCardUsage + 5);
+    }
+    
+    // Check if holding for big melds
+    if (meldSize >= 5) {
+        playerStyleData.playerProfile.preferences.holdsForBigMelds++;
+    }
+    
+    // Calculate meld speed (how quickly player makes melds)
+    const turnsBeforeMeld = playerStyleData.playerProfile.totalMoves;
+    if (!gameState.playerFirstMeldMade) {
+        playerStyleData.playerProfile.patterns.avgTurnsBeforeFirstMeld = turnsBeforeMeld;
+        playerStyleData.playerProfile.style.meldSpeed = Math.max(0, 100 - (turnsBeforeMeld * 10));
+    }
+    
+    // Calculate aggressiveness
+    const seqRatio = playerStyleData.playerProfile.preferences.prefersSequences / 
+                     (playerStyleData.playerProfile.preferences.prefersSequences + 
+                      playerStyleData.playerProfile.preferences.prefersSets + 1);
+    playerStyleData.playerProfile.style.aggressiveness = 30 + (seqRatio * 40) + 
+                                                          (playerStyleData.playerProfile.style.meldSpeed * 0.3);
+    
+    savePlayerStyle();
+}
+
+// Track when player discards a card
+function trackDiscardChoice(card) {
+    const points = card.points;
+    
+    // Categorize card
+    if (points >= 15) {
+        playerStyleData.playerProfile.discardPatterns.highCards++;
+    } else if (points <= 5) {
+        playerStyleData.playerProfile.discardPatterns.lowCards++;
+    } else {
+        playerStyleData.playerProfile.discardPatterns.middleCards++;
+    }
+    
+    // Check if it's a duplicate (player has another card with same value)
+    const hasDuplicate = gameState.playerHand.some(c => c.value === card.value && c !== card);
+    if (hasDuplicate) {
+        playerStyleData.playerProfile.discardPatterns.duplicates++;
+    } else {
+        playerStyleData.playerProfile.discardPatterns.isolatedCards++;
+    }
+    
+    savePlayerStyle();
+}
+
+// Track game results
+function trackGameResult(won, score) {
+    playerStyleData.playerProfile.gamesPlayed++;
+    
+    if (won) {
+        playerStyleData.statistics.wins++;
+    } else {
+        playerStyleData.statistics.losses++;
+    }
+    
+    // Update average score
+    const currentAvg = playerStyleData.statistics.avgScore;
+    const totalGames = playerStyleData.playerProfile.gamesPlayed;
+    playerStyleData.statistics.avgScore = (currentAvg * (totalGames - 1) + score) / totalGames;
+    
+    if (score > playerStyleData.statistics.highestScore) {
+        playerStyleData.statistics.highestScore = score;
+    }
+    
+    savePlayerStyle();
+}
+
+// Track Buraco creation
+function trackBuracoCreation(isClean) {
+    playerStyleData.statistics.totalBuracosCreated++;
+    if (isClean) {
+        playerStyleData.statistics.cleanBuracosCreated++;
+    } else {
+        playerStyleData.statistics.dirtyBuracosCreated++;
+    }
+    savePlayerStyle();
+}
+
+// Helper: Check if meld is a sequence
+function checkIfSequence(meld) {
+    const nonWilds = meld.filter(c => c.value !== '2' && c.value !== 'Joker');
+    if (nonWilds.length < 2) return false;
+    
+    const suit = nonWilds[0].suit;
+    const allSameSuit = nonWilds.every(c => c.suit === suit);
+    
+    if (!allSameSuit) return false;
+    
+    const valueOrder = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+    const indices = nonWilds.map(c => valueOrder.indexOf(c.value)).sort((a, b) => a - b);
+    
+    for (let i = 1; i < indices.length; i++) {
+        const gap = indices[i] - indices[i-1];
+        if (gap > 2) return false; // Too big gap even for wilds
+    }
+    
+    return true;
+}
+
+// ============================================
+// AI ADAPTATION SYSTEM
+// ============================================
+
+// Update AI strategy based on player style
+function updateAIStrategy() {
+    const profile = playerStyleData.playerProfile;
+    const ai = playerStyleData.aiAdaptation;
+    
+    // Analyze player style
+    const isAggressive = profile.style.aggressiveness > 65;
+    const isConservative = profile.style.aggressiveness < 35;
+    const isRisky = profile.style.riskTolerance > 65;
+    const isCautious = profile.style.riskTolerance < 35;
+    
+    // Determine AI counter-strategy
+    if (isAggressive && isRisky) {
+        ai.currentStrategy = "defensive";
+        ai.counterStrategies.againstAggressive = true;
+        ai.counterStrategies.againstRisky = true;
+        console.log('🤖 AI Strategy: DEFENSIVE (counter aggressive + risky player)');
+    } else if (isConservative && isCautious) {
+        ai.currentStrategy = "aggressive";
+        ai.counterStrategies.againstConservative = true;
+        ai.counterStrategies.againstCautious = true;
+        console.log('🤖 AI Strategy: AGGRESSIVE (counter conservative + cautious player)');
+    } else if (isAggressive) {
+        ai.currentStrategy = "patient";
+        ai.counterStrategies.againstAggressive = true;
+        console.log('🤖 AI Strategy: PATIENT (counter aggressive player)');
+    } else if (isConservative) {
+        ai.currentStrategy = "opportunistic";
+        ai.counterStrategies.againstConservative = true;
+        console.log('🤖 AI Strategy: OPPORTUNISTIC (counter conservative player)');
+    } else {
+        ai.currentStrategy = "balanced";
+        console.log('🤖 AI Strategy: BALANCED (neutral player)');
+    }
+    
+    // Update confidence level
+    const totalMoves = profile.totalMoves;
+    ai.learningProgress.movesAnalyzed = totalMoves;
+    ai.learningProgress.confidenceLevel = Math.min(100, totalMoves / 10);
+    
+    // Detect patterns
+    ai.learningProgress.patternsDetected = 0;
+    if (profile.preferences.prefersSequences > profile.preferences.prefersSets * 1.5) {
+        ai.learningProgress.patternsDetected++;
+    }
+    if (profile.patterns.drawFromDiscard > profile.patterns.drawFromDeck * 1.5) {
+        ai.learningProgress.patternsDetected++;
+    }
+    if (profile.discardPatterns.highCards > profile.discardPatterns.lowCards * 1.5) {
+        ai.learningProgress.patternsDetected++;
+    }
+    
+    ai.adaptationLevel = Math.min(100, (ai.learningProgress.confidenceLevel + 
+                                         ai.learningProgress.patternsDetected * 10));
+}
+
+// Modify AI decision based on learned player style
+function getAIAdaptedThreshold(baseThreshold) {
+    const ai = playerStyleData.aiAdaptation;
+    const profile = playerStyleData.playerProfile;
+    
+    // If not enough data, use base threshold
+    if (ai.learningProgress.confidenceLevel < 20) {
+        return baseThreshold;
+    }
+    
+    let modifier = 0;
+    
+    // Against aggressive players: be more conservative
+    if (ai.counterStrategies.againstAggressive) {
+        modifier -= 15;
+    }
+    
+    // Against conservative players: be more aggressive
+    if (ai.counterStrategies.againstConservative) {
+        modifier += 15;
+    }
+    
+    // Against risky players: exploit their risks
+    if (ai.counterStrategies.againstRisky) {
+        modifier -= 10;
+    }
+    
+    // Against cautious players: take more risks
+    if (ai.counterStrategies.againstCautious) {
+        modifier += 10;
+    }
+    
+    return Math.max(0, Math.min(100, baseThreshold + modifier));
+}
+
+// Export/Download player style as JSON
+function downloadPlayerStyle() {
+    const dataStr = JSON.stringify(playerStyleData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = `buraco-style-${playerStyleData.lastUpdated}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+    
+    console.log('📥 Downloaded player style as JSON');
+}
+
+// Show player statistics modal
+function showPlayerStats() {
+    const profile = playerStyleData.playerProfile;
+    const stats = playerStyleData.statistics;
+    const ai = playerStyleData.aiAdaptation;
+    
+    // Basic stats
+    document.getElementById('statGamesPlayed').textContent = profile.gamesPlayed;
+    document.getElementById('statTotalMoves').textContent = profile.totalMoves;
+    
+    const totalGames = stats.wins + stats.losses + stats.draws;
+    const winRate = totalGames > 0 ? ((stats.wins / totalGames) * 100).toFixed(1) : 0;
+    document.getElementById('statWinRate').textContent = winRate + '%';
+    
+    // Style
+    document.getElementById('statAggressiveness').textContent = profile.style.aggressiveness.toFixed(1);
+    document.getElementById('statRiskTolerance').textContent = profile.style.riskTolerance.toFixed(1);
+    document.getElementById('statMeldSpeed').textContent = profile.style.meldSpeed.toFixed(1);
+    document.getElementById('statWildCardUsage').textContent = profile.style.wildCardUsage.toFixed(1);
+    
+    // Labels for style
+    const aggValue = profile.style.aggressiveness;
+    document.getElementById('aggLabel').textContent = 
+        aggValue > 65 ? '(Aggressive 🔥)' : aggValue < 35 ? '(Conservative 🛡️)' : '(Balanced ⚖️)';
+    
+    const riskValue = profile.style.riskTolerance;
+    document.getElementById('riskLabel').textContent = 
+        riskValue > 65 ? '(Risky 🎲)' : riskValue < 35 ? '(Cautious 🎯)' : '(Moderate 📊)';
+    
+    const speedValue = profile.style.meldSpeed;
+    document.getElementById('speedLabel').textContent = 
+        speedValue > 65 ? '(Fast ⚡)' : speedValue < 35 ? '(Slow 🐢)' : '(Normal ⏱️)';
+    
+    // Preferences
+    document.getElementById('statSequences').textContent = profile.preferences.prefersSequences;
+    document.getElementById('statSets').textContent = profile.preferences.prefersSets;
+    document.getElementById('statAvgMeldSize').textContent = profile.patterns.avgMeldSize.toFixed(1);
+    
+    // AI Adaptation
+    document.getElementById('statAIStrategy').textContent = ai.currentStrategy;
+    document.getElementById('statAdaptationLevel').textContent = ai.adaptationLevel.toFixed(1);
+    document.getElementById('statConfidenceLevel').textContent = ai.learningProgress.confidenceLevel.toFixed(1);
+    document.getElementById('statPatternsDetected').textContent = ai.learningProgress.patternsDetected;
+    
+    // Achievements
+    document.getElementById('statTotalBuracos').textContent = stats.totalBuracosCreated;
+    document.getElementById('statCleanBuracos').textContent = stats.cleanBuracosCreated;
+    document.getElementById('statDirtyRuns').textContent = stats.dirtyBuracosCreated;
+    document.getElementById('statHighestScore').textContent = stats.highestScore;
+    
+    // Show modal
+    document.getElementById('statsModal').style.display = 'block';
+}
+
+// Reset player style data
+function resetPlayerStyle() {
+    if (confirm('Reset semua data pembelajaran AI? Ini akan menghapus semua history permainan Anda.')) {
+        playerStyleData = {
+            version: "1.0",
+            lastUpdated: new Date().toISOString().split('T')[0],
+            playerProfile: {
+                gamesPlayed: 0,
+                totalMoves: 0,
+                style: { aggressiveness: 50, riskTolerance: 50, meldSpeed: 50, wildCardUsage: 50 },
+                preferences: { prefersSequences: 0, prefersSets: 0, usesWildCardsEarly: 0, holdsForBigMelds: 0 },
+                patterns: { drawFromDiscard: 0, drawFromDeck: 0, avgMeldSize: 0, avgTurnsBeforeFirstMeld: 0, avgCardsInHandBeforeMeld: 0 },
+                discardPatterns: { highCards: 0, lowCards: 0, middleCards: 0, duplicates: 0, isolatedCards: 0 }
+            },
+            aiAdaptation: {
+                currentStrategy: "balanced",
+                adaptationLevel: 0,
+                counterStrategies: { againstAggressive: false, againstConservative: false, againstRisky: false, againstCautious: false },
+                learningProgress: { movesAnalyzed: 0, patternsDetected: 0, confidenceLevel: 0 }
+            },
+            statistics: { wins: 0, losses: 0, draws: 0, avgScore: 0, highestScore: 0, totalBuracosCreated: 0, cleanBuracosCreated: 0, dirtyBuracosCreated: 0 }
+        };
+        console.log('🔄 Player style data reset');
+        updateStatus('✅ Data pembelajaran AI telah direset! gameStyle.json kembali ke default.');
+        alert('Data AI telah direset!\n\nSilakan download gameStyle.json yang baru untuk replace file yang lama.');
+    }
+}
