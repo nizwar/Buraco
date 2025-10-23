@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buraco</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🃏 BURACO 🃏</h1>
+        </header>
+
+        <div class="game-info">
+            <div class="score-board">
+                <div class="player-score">
+                    <h3>Pemain</h3>
+                    <p class="score" id="playerScore">0</p>
+                </div>
+                <div class="player-score">
+                    <h3>Komputer</h3>
+                    <p class="score" id="computerScore">0</p>
+                </div>
+            </div>
+            <button id="tutorialBtn" class="tutorial-btn">📖 Lihat Tutorial</button>
+        </div>
+
+        <div class="game-board">
+            <!-- Area Komputer -->
+            <div class="opponent-area">
+                <h3>Kartu Komputer</h3>
+                <div id="computerHand" class="hand"></div>
+                <div id="computerMelds" class="melds-area">
+                    <p class="meld-label">Kombinasi Komputer:</p>
+                </div>
+            </div>
+
+            <!-- Area Tengah (Tumpukan) -->
+            <div class="center-area">
+                <div class="pile-container">
+                    <div class="pile">
+                        <h4>Tumpukan Buang</h4>
+                        <div id="discardPile" class="card-pile"></div>
+                    </div>
+                    <div class="pile">
+                        <h4>Deck</h4>
+                        <div id="drawPile" class="card-pile">
+                            <div class="card back">🂠</div>
+                        </div>
+                    </div>
+                    <div class="pile">
+                        <h4>Pot (Buraco)</h4>
+                        <div id="potPile" class="card-pile">
+                            <div class="card back">🎁</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="game-status" id="gameStatus">Klik "Mulai Game" untuk bermain</div>
+            </div>
+
+            <!-- Area Pemain -->
+            <div class="player-area">
+                <h3>Kartu Anda</h3>
+                <div id="playerHand" class="hand"></div>
+                <div id="playerMelds" class="melds-area">
+                    <p class="meld-label">Kombinasi Anda:</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="startBtn" class="btn btn-primary">🎮 Mulai Game</button>
+            <button id="drawBtn" class="btn" disabled>📥 Ambil Kartu</button>
+            <button id="meldBtn" class="btn" disabled>📋 Buat Kombinasi</button>
+            <button id="discardBtn" class="btn" disabled>🗑️ Buang Kartu</button>
+            <button id="takePotBtn" class="btn" disabled>🎁 Ambil Pot</button>
+        </div>
+    </div>
+
+    <!-- Modal Tutorial -->
+    <div id="tutorialModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>📖 Cara Bermain Buraco</h2>
+            
+            <div class="tutorial-section">
+                <h3>🎯 Tujuan Permainan</h3>
+                <p>Buraco adalah permainan kartu yang dimainkan dengan 2 deck standar (104 kartu + 4 joker). Tujuannya adalah membuat kombinasi kartu (sequences atau sets) dan menghabiskan semua kartu di tangan Anda.</p>
+            </div>
+
+            <div class="tutorial-section">
+                <h3>🃏 Nilai Kartu</h3>
+                <ul>
+                    <li><strong>Joker & 2:</strong> Kartu liar (wild card) - dapat menggantikan kartu apapun</li>
+                    <li><strong>A (As):</strong> 15 poin</li>
+                    <li><strong>K, Q, J, 10, 9, 8:</strong> 10 poin</li>
+                    <li><strong>7, 6, 5, 4, 3:</strong> 5 poin</li>
+                </ul>
+            </div>
+
+            <div class="tutorial-section">
+                <h3>🎮 Cara Bermain</h3>
+                <ol>
+                    <li><strong>Awal Game:</strong> Setiap pemain mendapat 11 kartu. Ada juga "Pot" (11 kartu tersembunyi) yang bisa diambil saat kartu habis.</li>
+                    <li><strong>Giliran:</strong>
+                        <ul>
+                            <li>Ambil kartu dari deck atau tumpukan buang</li>
+                            <li>Buat kombinasi kartu (opsional)</li>
+                            <li>Buang 1 kartu ke tumpukan buang</li>
+                        </ul>
+                    </li>
+                    <li><strong>Kombinasi Valid:</strong>
+                        <ul>
+                            <li><strong>Sequence:</strong> 3+ kartu berurutan dengan lambang sama (contoh: 5♥ 6♥ 7♥)</li>
+                            <li><strong>Set:</strong> 3+ kartu dengan angka sama (contoh: 8♠ 8♥ 8♦)</li>
+                            <li>Minimal 3 kartu untuk membuat kombinasi</li>
+                        </ul>
+                    </li>
+                    <li><strong>Buraco (Clean Run):</strong> Kombinasi 7+ kartu tanpa kartu liar = bonus 200 poin!</li>
+                    <li><strong>Dirty Run:</strong> Kombinasi 7+ kartu dengan kartu liar = 100 poin</li>
+                </ol>
+            </div>
+
+            <div class="tutorial-section">
+                <h3>🏆 Cara Menang</h3>
+                <p>Game berakhir ketika seorang pemain menghabiskan semua kartunya dan pot-nya. Pemain dengan skor tertinggi menang!</p>
+                <ul>
+                    <li>Kombinasi kartu: +poin sesuai nilai kartu</li>
+                    <li>Buraco (clean run): +200 poin bonus</li>
+                    <li>Dirty run (dengan wild card): +100 poin bonus</li>
+                    <li>Kartu tersisa di tangan: -poin</li>
+                </ul>
+            </div>
+
+            <div class="tutorial-section">
+                <h3>💡 Tips Bermain</h3>
+                <ul>
+                    <li>Fokus membuat sequences panjang untuk mendapat Buraco</li>
+                    <li>Gunakan Joker dan angka 2 secara strategis</li>
+                    <li>Perhatikan kartu yang dibuang lawan</li>
+                    <li>Jangan terburu-buru mengambil Pot</li>
+                    <li>Buang kartu bernilai tinggi jika tidak bisa dikombinasikan</li>
+                </ul>
+            </div>
+
+            <button class="btn btn-primary close-tutorial">Mulai Bermain!</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
