@@ -1640,6 +1640,7 @@ function showInstallButton() {
             position: fixed;
             top: 20px;
             right: 20px;
+            left: 20px;
             z-index: 10000;
             background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
             color: #1a4d2e;
