@@ -1927,5 +1927,61 @@ function initPWAFeatures() {
     }
 }
 
-// Initialize PWA features when DOM is loaded
-document.addEventListener('DOMContentLoaded', initPWAFeatures);
+// Orientation and layout handling
+function handleOrientationChange() {
+    // Add a small delay to allow the browser to complete the orientation change
+    setTimeout(() => {
+        const isLandscape = window.innerWidth > window.innerHeight;
+        const isMobile = window.innerWidth <= 768;
+        
+        if (isLandscape && isMobile) {
+            console.log('Landscape mobile mode activated');
+            document.body.classList.add('landscape-mobile');
+            
+            // Adjust game board height for landscape
+            const gameBoard = document.querySelector('.game-board');
+            if (gameBoard) {
+                gameBoard.style.maxHeight = `${window.innerHeight - 120}px`;
+            }
+            
+            // Show landscape tip for first time users
+            if (!localStorage.getItem('landscapeTipShown')) {
+                setTimeout(() => {
+                    updateStatus('Tip: Swipe horizontally to scroll through your cards in landscape mode!');
+                    localStorage.setItem('landscapeTipShown', 'true');
+                }, 1000);
+            }
+        } else {
+            document.body.classList.remove('landscape-mobile');
+            
+            // Reset game board height for portrait
+            const gameBoard = document.querySelector('.game-board');
+            if (gameBoard) {
+                gameBoard.style.maxHeight = 'none';
+            }
+        }
+        
+        // Force re-render of cards to adjust positioning
+        updateDisplay();
+    }, 100);
+}
+
+// Listen for orientation changes
+window.addEventListener('orientationchange', handleOrientationChange);
+window.addEventListener('resize', handleOrientationChange);
+
+// Initialize orientation handling
+document.addEventListener('DOMContentLoaded', () => {
+    initPWAFeatures();
+    handleOrientationChange();
+    
+    // Prevent zoom on double tap for better mobile experience
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function (event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+});
