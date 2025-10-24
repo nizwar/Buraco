@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA Test - Buraco</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            max-width: 600px; 
+            margin: 0 auto;
+        }
+        .status { 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 5px; 
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { 
+            background: #1a4d2e; 
+            color: #ffd700; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+        button:hover { background: #2d5f3f; }
+    </style>
+</head>
+<body>
+    <h1>Buraco PWA Status Check</h1>
+    
+    <div id="status-container">
+        <div class="status info">Testing PWA features...</div>
+    </div>
+    
+    <div>
+        <button onclick="testServiceWorker()">Test Service Worker</button>
+        <button onclick="testManifest()">Test Manifest</button>
+        <button onclick="testInstallability()">Test Installability</button>
+        <button onclick="testOffline()">Test Offline Support</button>
+        <button onclick="window.location.href='index.html'">Go to Game</button>
+    </div>
+
+    <script>
+        const statusContainer = document.getElementById('status-container');
+        
+        function addStatus(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = message;
+            statusContainer.appendChild(div);
+        }
+        
+        function clearStatus() {
+            statusContainer.innerHTML = '';
+        }
+        
+        async function testServiceWorker() {
+            clearStatus();
+            addStatus('Testing Service Worker...', 'info');
+            
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.register('./sw.js');
+                    addStatus('✅ Service Worker registered successfully!', 'success');
+                    addStatus(`Scope: ${registration.scope}`, 'info');
+                } catch (error) {
+                    addStatus(`❌ Service Worker registration failed: ${error.message}`, 'error');
+                }
+            } else {
+                addStatus('❌ Service Worker not supported in this browser', 'error');
+            }
+        }
+        
+        async function testManifest() {
+            clearStatus();
+            addStatus('Testing Web App Manifest...', 'info');
+            
+            try {
+                const response = await fetch('./manifest.json');
+                if (response.ok) {
+                    const manifest = await response.json();
+                    addStatus('✅ Manifest loaded successfully!', 'success');
+                    addStatus(`App Name: ${manifest.name}`, 'info');
+                    addStatus(`Short Name: ${manifest.short_name}`, 'info');
+                    addStatus(`Icons: ${manifest.icons.length} defined`, 'info');
+                } else {
+                    addStatus('❌ Failed to load manifest.json', 'error');
+                }
+            } catch (error) {
+                addStatus(`❌ Manifest test failed: ${error.message}`, 'error');
+            }
+        }
+        
+        function testInstallability() {
+            clearStatus();
+            addStatus('Testing PWA Installability...', 'info');
+            
+            // Check if running as PWA
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                addStatus('✅ Already running as installed PWA!', 'success');
+                return;
+            }
+            
+            // Check for install prompt support
+            if ('BeforeInstallPromptEvent' in window) {
+                addStatus('✅ Install prompt supported', 'success');
+            } else {
+                addStatus('⚠️ Install prompt may not be supported', 'warning');
+            }
+            
+            // Check manifest
+            const manifestLink = document.querySelector('link[rel="manifest"]');
+            if (manifestLink) {
+                addStatus('✅ Manifest link found in HTML', 'success');
+            } else {
+                addStatus('❌ No manifest link found in HTML', 'error');
+            }
+            
+            // Check HTTPS
+            if (location.protocol === 'https:' || location.hostname === 'localhost') {
+                addStatus('✅ Secure context (HTTPS/localhost)', 'success');
+            } else {
+                addStatus('❌ Requires HTTPS for installation', 'error');
+            }
+        }
+        
+        async function testOffline() {
+            clearStatus();
+            addStatus('Testing Offline Support...', 'info');
+            
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.getRegistration();
+                    if (registration) {
+                        addStatus('✅ Service Worker active for offline support', 'success');
+                        
+                        // Test cache
+                        if ('caches' in window) {
+                            const cacheNames = await caches.keys();
+                            if (cacheNames.length > 0) {
+                                addStatus(`✅ Cache available: ${cacheNames.join(', ')}`, 'success');
+                            } else {
+                                addStatus('⚠️ No caches found yet', 'warning');
+                            }
+                        }
+                    } else {
+                        addStatus('❌ No Service Worker registered', 'error');
+                    }
+                } catch (error) {
+                    addStatus(`❌ Offline test failed: ${error.message}`, 'error');
+                }
+            } else {
+                addStatus('❌ Service Worker not supported', 'error');
+            }
+            
+            // Test network status
+            if (navigator.onLine) {
+                addStatus('✅ Currently online', 'success');
+            } else {
+                addStatus('📴 Currently offline', 'info');
+            }
+        }
+        
+        // Auto-run basic tests on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                clearStatus();
+                testServiceWorker();
+            }, 1000);
+        });
+        
+        // Listen for online/offline events
+        window.addEventListener('online', () => {
+            addStatus('🌐 Back online!', 'success');
+        });
+        
+        window.addEventListener('offline', () => {
+            addStatus('📴 Gone offline', 'warning');
+        });
+    </script>
+</body>
+</html>

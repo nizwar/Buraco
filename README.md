@@ -1,81 +1,89 @@
-# 🃏 BURACO - Permainan Kartu Brasil/Italia
+# BURACO - Brazilian/Italian Card Game
 
-Game kartu Buraco digital yang autentik dengan aturan lengkap sesuai permainan aslinya.
+Authentic digital Buraco card game with complete rules following the original game.
 
 ![Buraco Game](https://img.shields.io/badge/Game-Buraco-green)
 ![Version](https://img.shields.io/badge/version-2.0-blue)
+![PWA](https://img.shields.io/badge/PWA-enabled-orange)
 ![License](https://img.shields.io/badge/license-MIT-yellow)
 
-## 🎮 Fitur Game
+## Game Features
 
-### ✨ Aturan Autentik Buraco
-- **2 Deck Kartu**: 104 kartu standar + 4 joker
-- **Pot Terpisah**: Setiap pemain punya pot sendiri (11 kartu)
-- **Minimum Meld**: Kombinasi pertama harus 50+ poin
-- **Multi-Round**: Game berlanjut sampai 2000 poin
-- **Buraco Wajib**: Harus punya 1 Buraco (7+ kartu) untuk menang ronde
+### PWA (Progressive Web App) Support
+- **Install on Device**: Install as native app on mobile/desktop
+- **Offline Play**: Full game functionality works offline
+- **Auto-Updates**: Automatic updates when new versions are available
+- **Background Sync**: Save game data even when offline
+- **Native Feel**: Runs like a native app when installed
 
-### 🎯 Mekanik Permainan
-- Ambil kartu dari deck atau ambil **SELURUH** tumpukan buang
-- Buat kombinasi: Set (3+ kartu sama) atau Sequence (3+ berurutan)
-- Tambahkan kartu ke kombinasi yang sudah ada
-- Wild cards: Joker (50 poin) dan angka 2 (20 poin)
-- Clean Buraco (7+ tanpa wild): **+200 poin bonus**
-- Dirty Run (7+ dengan wild): **+100 poin bonus**
+### Authentic Buraco Rules
+- **2 Card Decks**: 104 standard cards + 4 jokers
+- **Separate Pot**: Each player has their own pot (11 cards)
+- **Minimum Meld**: First combination must be 50+ points
+- **Multi-Round**: Game continues until 2000 points
+- **Buraco Required**: Must have 1 Buraco (7+ cards) to win round
 
-### 🎨 Desain
-- Tampilan meja hijau kasino yang realistis
-- Kartu dengan efek 3D dan shadow
-- Tema emas dan mewah
-- Responsif untuk berbagai ukuran layar
-- Animasi smooth dan interaktif
-- Animasi pembagian kartu yang realistis
+### Game Mechanics
+- Draw card from deck or take **ENTIRE** discard pile
+- Create combinations: Set (3+ same cards) or Sequence (3+ consecutive)
+- Add cards to existing combinations
+- Wild cards: Joker (50 points) and number 2 (20 points)
+- Clean Buraco (7+ without wild): **+200 bonus points**
+- Dirty Run (7+ with wild): **+100 bonus points**
 
-### 🤖 AI Pintar
-- **Strategi Discard Pile**: AI mengevaluasi apakah worth it mengambil tumpukan buang
-- **Evaluasi Kartu**: AI menilai kualitas kartu untuk keputusan yang lebih baik
-- **Prioritas Kombinasi**: AI mencari kombinasi terpanjang dan terbaik
-- **Menambah ke Kombinasi**: AI aktif menambahkan kartu ke kombinasi existing
-- **Discard Cerdas**: AI membuang kartu paling tidak berguna
-- **Adaptif**: AI menyesuaikan strategi berdasarkan situasi game
+### Design
+- Realistic casino green table display
+- Cards with 3D effects and shadows
+- Gold and luxury theme
+- Responsive for various screen sizes
+- Smooth and interactive animations
+- Realistic card dealing animations
 
-### 🧠 AI Learning System (NEW!)
-- **📊 Tracking Otomatis**: Game melacak style bermain Anda secara real-time
-- **🎯 Adaptive AI**: AI belajar dari kebiasaan Anda dan menyesuaikan strategi
-- **📈 Profile Player**: Sistem menganalisis aggressiveness, risk tolerance, dan preferences
-- **🤖 Counter-Strategy**: AI mengembangkan strategi counter berdasarkan style Anda
-  - Vs Aggressive Player → AI main **DEFENSIVE**
-  - Vs Conservative Player → AI main **AGGRESSIVE**
-  - Vs Risky Player → AI **EXPLOIT** kelemahan
-  - Vs Cautious Player → AI main **OPPORTUNISTIC**
-- **💾 Data Storage**: Data learning disimpan di **localStorage browser** (otomatis)
-- **📥 Export/Import**: Download data sebagai `gameStyle.json` untuk backup
-- **🔒 Privacy**: Semua data disimpan lokal di browser, tidak ada tracking online
+### Smart AI
+- **Discard Pile Strategy**: AI evaluates whether it's worth taking discard pile
+- **Card Evaluation**: AI assesses card quality for better decisions
+- **Combination Priority**: AI seeks longest and best combinations
+- **Add to Combinations**: AI actively adds cards to existing combinations
+- **Smart Discard**: AI discards least useful cards
+- **Adaptive**: AI adjusts strategy based on game situation
 
-#### 📁 Data Structure
-Data pembelajaran AI memiliki struktur JSON seperti ini (lihat `gameStyle.template.json` untuk referensi lengkap):
+### AI Learning System (NEW!)
+- **Automatic Tracking**: Game tracks your playing style in real-time
+- **Adaptive AI**: AI learns from your habits and adjusts strategy
+- **Player Profile**: System analyzes aggressiveness, risk tolerance, and preferences
+- **Counter-Strategy**: AI develops counter strategies based on your style
+  - Vs Aggressive Player → AI plays **DEFENSIVE**
+  - Vs Conservative Player → AI plays **AGGRESSIVE**
+  - Vs Risky Player → AI **EXPLOITS** weaknesses
+  - Vs Cautious Player → AI plays **OPPORTUNISTIC**
+- **Data Storage**: Learning data stored in **browser localStorage** (automatic)
+- **Export/Import**: Download data as `gameStyle.json` for backup
+- **Privacy**: All data stored locally in browser, no online tracking
+
+#### Data Structure
+AI learning data has JSON structure like this (see `gameStyle.template.json` for complete reference):
 ```json
 {
   "playerProfile": {
     "gamesPlayed": 0,
     "totalMoves": 0,
     "style": {
-      "aggressiveness": 50,    // 0-100: Seberapa agresif Anda bermain
-      "riskTolerance": 50,      // 0-100: Seberapa berani ambil risiko
-      "meldSpeed": 50,          // 0-100: Seberapa cepat buat kombinasi
-      "wildCardUsage": 50       // 0-100: Seberapa sering gunakan wild cards
+      "aggressiveness": 50,    // 0-100: How aggressive you play
+      "riskTolerance": 50,      // 0-100: How willing to take risks
+      "meldSpeed": 50,          // 0-100: How fast you create combinations
+      "wildCardUsage": 50       // 0-100: How often you use wild cards
     },
     "preferences": {
-      "prefersSequences": 0,    // Jumlah sequences dibuat
-      "prefersSets": 0,         // Jumlah sets dibuat
-      "usesWildCardsEarly": 0,  // Frekuensi pakai wild cards early
-      "holdsForBigMelds": 0     // Frekuensi hold untuk melds besar
+      "prefersSequences": 0,    // Number of sequences created
+      "prefersSets": 0,         // Number of sets created
+      "usesWildCardsEarly": 0,  // Frequency of early wild card usage
+      "holdsForBigMelds": 0     // Frequency of holding for big melds
     }
   },
   "aiAdaptation": {
     "currentStrategy": "balanced",  // AI strategy: balanced/defensive/aggressive/patient/opportunistic
-    "adaptationLevel": 0,           // 0-100: Seberapa adapt AI
-    "confidenceLevel": 0            // 0-100: Confidence AI terhadap analisis
+    "adaptationLevel": 0,           // 0-100: How adapted AI is
+    "confidenceLevel": 0            // 0-100: AI confidence in analysis
   },
   "statistics": {
     "wins": 0,
@@ -86,241 +94,297 @@ Data pembelajaran AI memiliki struktur JSON seperti ini (lihat `gameStyle.templa
 }
 ```
 
-#### 🎮 Cara Kerja AI Learning
-1. **Tracking**: Setiap move Anda dianalisis (draw choice, meld creation, discard pattern)
-2. **Analysis**: AI menghitung metrics style bermain Anda
-3. **Adaptation**: AI adjust strategi berdasarkan pattern yang terdeteksi
-4. **Counter-Play**: AI develop strategi optimal melawan style Anda
+#### How AI Learning Works
+1. **Tracking**: Every move you make is analyzed (draw choice, meld creation, discard pattern)
+2. **Analysis**: AI calculates metrics of your playing style
+3. **Adaptation**: AI adjusts strategy based on detected patterns
+4. **Counter-Play**: AI develops optimal strategy against your style
 
-#### 💾 Mengelola Data Learning
-- **Auto-Save**: Setiap aksi otomatis disimpan ke localStorage browser
-- **Lihat Statistik**: Klik button "📊 Lihat Statistik AI" untuk melihat profil & analytics
-- **Download Backup**: Klik "💾 Download gameStyle.json" untuk export & backup data
-- **Reset Data**: Klik "🔄 Reset Data AI" untuk mulai pembelajaran dari awal
-- **Import Data**: Copy data JSON yang sudah ada dan replace di localStorage (via browser console)
+#### Managing Learning Data
+- **Auto-Save**: Every action automatically saved to browser localStorage
+- **View Statistics**: Click "View AI Statistics" button to see profile & analytics
+- **Download Backup**: Click "Download gameStyle.json" to export & backup data
+- **Reset Data**: Click "Reset AI Data" to start learning from scratch
+- **Import Data**: Copy existing JSON data and replace in localStorage (via browser console)
 
-#### 🔧 Tips Optimasi
-- **Minimal 50 moves** untuk AI mulai adapt dengan baik
-- **100+ moves** untuk AI confidence level tinggi
-- Setelah download gameStyle.json baru, refresh browser untuk load data terbaru
+#### Optimization Tips
+- **Minimum 50 moves** for AI to start adapting well
+- **100+ moves** for high AI confidence level
+- After downloading new gameStyle.json, refresh browser to load latest data
 
-## 🚀 Cara Menjalankan
+## How to Run
 
-### Method 1: Langsung di Browser
+### Method 1: PWA Installation (Recommended)
+```bash
+# Serve the files via HTTPS (required for PWA)
+# Using Python:
+python -m http.server 8000
+
+# Or using Node.js:
+npx http-server
+
+# Open browser: https://localhost:8000
+# Click "Install App" button when it appears
+```
+
+**Installation Steps:**
+1. Open the game in a modern browser (Chrome, Firefox, Safari, Edge)
+2. Look for the "Install App" button in the top-right corner
+3. Click it and confirm installation
+4. The game will be installed as a native app on your device
+5. You can now play offline and get automatic updates!
+
+### Method 2: Direct in Browser
 ```bash
 # Clone repository
 git clone https://github.com/masalfi/Buraco.git
 
-# Buka file
+# Open file
 cd Buraco
 open index.html
 ```
 
-### Method 2: Local Server
+### Method 3: Local Server
 ```bash
-# Menggunakan Python
+# Using Python
 python -m http.server 8000
 
-# Atau menggunakan Node.js
+# Or using Node.js
 npx http-server
 
-# Buka browser: http://localhost:8000
+# Open browser: http://localhost:8000
 ```
 
-## 📖 Cara Bermain
+## How to Play
 
-### 1️⃣ Setup Awal
-- Setiap pemain mendapat 11 kartu
-- Setiap pemain punya pot tersendiri (11 kartu tersembunyi)
-- 1 kartu diletakkan sebagai discard pile pertama
+### Initial Setup
+- Each player gets 11 cards
+- Each player has their own pot (11 hidden cards)
+- 1 card is placed as first discard pile
 
-### 2️⃣ Giliran Pemain
-1. **Ambil Kartu**: Dari deck ATAU ambil seluruh tumpukan buang
-2. **Buat Kombinasi** (opsional):
-   - Kombinasi pertama harus minimal 50 poin
-   - Sequence: 3+ kartu berurutan dengan suit sama
-   - Set: 3+ kartu dengan nilai sama
-3. **Buang 1 Kartu** ke tumpukan buang
+### Player Turn
+1. **Draw Card**: From deck OR take entire discard pile
+2. **Create Combinations** (optional):
+   - First combination must be minimum 50 points
+   - Sequence: 3+ consecutive cards of same suit
+   - Set: 3+ cards of same value
+3. **Discard 1 Card** to discard pile
 
-### 3️⃣ Nilai Kartu
-- **Joker**: 50 poin (wild card)
-- **2 (Dua)**: 20 poin (wild card)
-- **A (As)**: 15 poin
-- **K, Q, J, 10, 9, 8**: 10 poin
-- **7, 6, 5, 4, 3**: 5 poin
+### Card Values
+- **Joker**: 50 points (wild card)
+- **2 (Two)**: 20 points (wild card)
+- **A (Ace)**: 15 points
+- **K, Q, J, 10, 9, 8**: 10 points
+- **7, 6, 5, 4, 3**: 5 points
 
-### 4️⃣ Buraco & Bonus
-- **Buraco (Clean)**: 7+ kartu tanpa wild = +200 poin
-- **Dirty Run**: 7+ kartu dengan wild = +100 poin
-- Anda HARUS punya minimal 1 Buraco untuk menghabiskan kartu!
+### Buraco & Bonus
+- **Buraco (Clean)**: 7+ cards without wild = +200 points
+- **Dirty Run**: 7+ cards with wild = +100 points
+- You MUST have at least 1 Buraco to exhaust cards!
 
-### 5️⃣ Pot
-- Saat kartu Anda habis, pot otomatis terbuka
-- Pot menjadi kartu tangan baru Anda
-- Lanjutkan bermain sampai pot juga habis
+### Pot
+- When your cards run out, pot automatically opens
+- Pot becomes your new hand
+- Continue playing until pot is also exhausted
 
-### 6️⃣ Akhir Ronde
-- Ronde berakhir saat ada pemain yang menghabiskan semua kartu (termasuk pot)
-- Pemain tersebut HARUS punya minimal 1 Buraco
-- Kartu tersisa di tangan = penalti (dikurangi dari skor)
+### Round End
+- Round ends when a player exhausts all cards (including pot)
+- That player MUST have at least 1 Buraco
+- Remaining cards in hand = penalty (deducted from score)
 
-### 7️⃣ Menang Game
-- Game berlanjut beberapa ronde sampai ada yang mencapai **2000 poin**
-- Pemain dengan skor tertinggi adalah pemenangnya!
+### Winning Game
+- Game continues several rounds until someone reaches **2000 points**
+- Player with highest score is the winner!
 
-## 🎯 Kontrol Game
+## Game Controls
 
 ### Keyboard & Mouse
-- **Klik Kartu**: Pilih/batalkan pilihan kartu
-- **Double-klik Kartu**: Buang kartu (saat sudah ambil kartu)
-- **Klik Kombinasi**: Lihat detail kombinasi
+- **Click Card**: Select/deselect card
+- **Double-click Card**: Discard card (when already drawn)
+- **Click Combination**: View combination details
 
-### Tombol
-- 🎮 **Mulai Game**: Mulai game baru
-- 📥 **Ambil Kartu**: Ambil dari deck
-- 📋 **Buat Kombinasi Baru**: Buat kombinasi dari kartu terpilih
-- ➕ **Tambah ke Kombinasi**: Tambah kartu ke kombinasi existing
-- 🗑️ **Buang Kartu**: Buang 1 kartu terpilih
-- 🎁 **Ambil Pot**: Ambil pot saat kartu habis
-- 📖 **Lihat Tutorial**: Buka panduan lengkap
+### Buttons
+- **Start Game**: Start new game
+- **Draw Card**: Draw from deck
+- **Create New Combination**: Create combination from selected cards
+- **Add to Combination**: Add card to existing combination
+- **Discard Card**: Discard 1 selected card
+- **Take Pot**: Take pot when cards run out
+- **View Tutorial**: Open complete guide
 
-## 💡 Tips & Strategi
+## Tips & Strategy
 
-### Untuk Pemula
-1. **Prioritas**: Fokus buat 1 Buraco dulu sebelum menghabiskan kartu
-2. **Meld Pertama**: Kumpulkan kartu sampai bisa buat kombinasi 50+ poin
-3. **Jangan Buru-buru**: Pot bisa jadi penyelamat atau masalah - gunakan dengan bijak
+### For Beginners
+1. **Priority**: Focus on creating 1 Buraco first before exhausting cards
+2. **First Meld**: Collect cards until you can create 50+ point combinations
+3. **Don't Rush**: Pot can be a lifesaver or problem - use wisely
 
 ### Advanced Strategy
-1. **Discard Pile**: Ambil hanya jika bisa langsung membuat kombinasi kuat
-2. **Wild Cards**: Simpan untuk melengkapi Buraco
-3. **Card Counting**: Perhatikan kartu yang dibuang lawan
-4. **Timing**: Kapan waktu tepat untuk "go out" dan mengakhiri ronde
+1. **Discard Pile**: Take only if you can immediately create strong combinations
+2. **Wild Cards**: Save for completing Buraco
+3. **Card Counting**: Pay attention to cards discarded by opponents
+4. **Timing**: When is the right time to "go out" and end the round
 
-## 🛠️ Teknologi
+## Technology
 
-- **HTML5**: Struktur game
-- **CSS3**: Styling dengan efek kasino
-- **Vanilla JavaScript**: Logika game (no framework)
+- **HTML5**: Game structure
+- **CSS3**: Styling with casino effects
+- **Vanilla JavaScript**: Game logic (no framework)
+- **PWA**: Progressive Web App support
+- **Service Worker**: Offline functionality and caching
+- **Web App Manifest**: Native app-like installation
 - **Git**: Version control
 
-## 📂 Struktur File
+## PWA Setup & Icons
+
+### Icon Generation
+To fully enable PWA features, you need to generate app icons:
+
+1. **Quick Method**: Open `generate-basic-icons.html` in browser and download icons
+2. **Advanced Method**: Open `icon-generator.html` for better quality icons  
+3. **Manual Method**: Create PNG files in `icons/` folder with these sizes:
+   - icon-192x192.png (required)
+   - icon-512x512.png (required)
+
+### PWA Features
+- **Offline Mode**: Game works completely offline after first load
+- **Install Prompt**: Automatic install button appears on supported browsers
+- **Background Sync**: Game data saved even when offline
+- **Auto Updates**: Notifications when new versions are available
+- **Native Integration**: Appears in app drawer/dock when installed
+
+### Browser Support
+- ✅ Chrome/Chromium (full support)
+- ✅ Firefox (full support) 
+- ✅ Safari (partial support)
+- ✅ Edge (full support)
+- ⚠️ Older browsers (graceful degradation)
+
+## File Structure
 
 ```
 Buraco/
-├── index.html      # Halaman utama game
-├── style.css       # Styling dengan tema meja hijau
-├── script.js       # Logika game Buraco
-└── README.md       # Dokumentasi (file ini)
+├── index.html                 # Main game page
+├── style.css                  # Styling with green table theme
+├── script.js                  # Buraco game logic
+├── manifest.json              # PWA manifest file
+├── sw.js                      # Service worker for offline support
+├── icon-generator.html        # Advanced icon generator
+├── generate-basic-icons.html  # Quick icon generator
+├── generate-icons.sh          # Icon generation script (requires ImageMagick)
+├── icons/                     # PWA icons directory
+│   ├── README.md              # Icon setup instructions
+│   └── icon-*.png             # App icons (generated)
+└── README.md                  # Documentation (this file)
 ```
 
-## 🐛 Known Issues & Future Improvements
+## Known Issues & Future Improvements
 
 ### To-Do List
-- [x] AI yang lebih pintar untuk komputer ✅
-- [x] Mode 4 pemain (2v2) ✅
-- [x] Animasi pembagian kartu ✅
+- [x] Smarter AI for computer ✅
+- [x] 4 player mode (2v2) ✅
+- [x] Card dealing animations ✅
 - [ ] Multiplayer online
 - [ ] Sound effects
 - [ ] Save game progress
 - [ ] Leaderboard
 - [ ] Mobile app version
-- [ ] Tutorial interaktif
+- [ ] Interactive tutorial
 
-## 📜 Aturan Lengkap Buraco
+## Complete Buraco Rules
 
-### Peraturan Resmi
-Game ini mengikuti aturan Buraco standar:
-- Minimum opening meld: 50 poin
-- Buraco requirement untuk finish
-- Pot system dengan 11 kartu per pemain
-- Multi-round game sampai 2000 poin
-- Wild cards: Joker dan 2
-- Penalty untuk kartu tersisa
+### Official Rules
+This game follows standard Buraco rules:
+- Minimum opening meld: 50 points
+- Buraco requirement to finish
+- Pot system with 11 cards per player
+- Multi-round game until 2000 points
+- Wild cards: Joker and 2
+- Penalty for remaining cards
 
-### Perbedaan dengan Canasta
-Meskipun mirip dengan Canasta, Buraco memiliki:
-- Pot system yang unik
-- Requirement untuk punya Buraco sebelum finish
-- Nilai poin yang berbeda
-- Aturan ambil discard pile yang berbeda
+### Differences from Canasta
+Although similar to Canasta, Buraco has:
+- Unique pot system
+- Requirement to have Buraco before finish
+- Different point values
+- Different discard pile taking rules
 
 ---
 
-## 🧠 AI Learning System - Dokumentasi
+## AI Learning System - Documentation
 
-### 📊 Bagaimana AI Belajar dari Anda?
+### How does AI Learn from You?
 
-Game ini memiliki sistem pembelajaran AI yang canggih yang **melacak dan menganalisis style bermain Anda** secara otomatis.
+This game has a sophisticated AI learning system that **tracks and analyzes your playing style** automatically.
 
-#### Data yang Dilacak:
+#### Data Tracked:
 
 ##### 1. **Player Profile** 
-- **Aggressiveness** (0-100): Seberapa agresif Anda bermain
-  - Dihitung dari: Kecepatan membuat meld, preference sequences vs sets
-- **Risk Tolerance** (0-100): Seberapa sering ambil risiko
-  - Dihitung dari: Seberapa sering ambil discard pile vs deck
-- **Meld Speed** (0-100): Seberapa cepat Anda membuat kombinasi
-- **Wild Card Usage** (0-100): Seberapa sering gunakan wild cards
+- **Aggressiveness** (0-100): How aggressive you play
+  - Calculated from: Speed of creating melds, preference sequences vs sets
+- **Risk Tolerance** (0-100): How often you take risks
+  - Calculated from: How often you take discard pile vs deck
+- **Meld Speed** (0-100): How fast you create combinations
+- **Wild Card Usage** (0-100): How often you use wild cards
 
 ##### 2. **Preferences**
-- Prefer Sequences atau Sets?
-- Menggunakan wild cards di awal atau akhir?
-- Suka menahan kartu untuk meld besar?
+- Prefer Sequences or Sets?
+- Use wild cards early or late?
+- Like to hold cards for big melds?
 
 ##### 3. **Patterns**
-- Berapa kali ambil dari discard pile vs deck
-- Rata-rata ukuran meld yang dibuat
-- Rata-rata turns sebelum meld pertama
-- Pattern kartu yang di-discard (high/low/middle cards)
+- How many times take from discard pile vs deck
+- Average meld size created
+- Average turns before first meld
+- Discard card patterns (high/low/middle cards)
 
 ##### 4. **Statistics**
 - Total games, wins, losses
 - Average score, highest score
-- Total Buracas created (clean & dirty)
+- Total Buracos created (clean & dirty)
 
-### 🤖 Strategi Adaptasi AI
+### AI Adaptation Strategy
 
-AI akan mengubah strateginya berdasarkan data yang dikumpulkan:
+AI will change its strategy based on collected data:
 
 #### Against Aggressive Player (Aggressiveness > 65)
 ```
-🛡️ AI Strategy: DEFENSIVE
-- More conservative dengan discard pile
-- Hold cards lebih lama
-- Focus pada defense daripada offense
+AI Strategy: DEFENSIVE
+- More conservative with discard pile
+- Hold cards longer
+- Focus on defense rather than offense
 - Wait for player mistakes
 ```
 
 #### Against Conservative Player (Aggressiveness < 35)
 ```
-⚡ AI Strategy: AGGRESSIVE
-- Lebih berani ambil discard pile
-- Create melds lebih cepat
-- Put pressure pada player
+AI Strategy: AGGRESSIVE
+- More willing to take discard pile
+- Create melds faster
+- Put pressure on player
 - Take calculated risks
 ```
 
 #### Against Risky Player (Risk Tolerance > 65)
 ```
-🎯 AI Strategy: EXPLOIT
-- AI akan exploit kebiasaan risky player
-- Counter dengan strategi yang lebih calculated
-- Biarkan player membuat mistakes
+AI Strategy: EXPLOIT
+- AI will exploit risky player habits
+- Counter with more calculated strategy
+- Let player make mistakes
 ```
 
 #### Against Cautious Player (Risk Tolerance < 35)
 ```
-🚀 AI Strategy: OPPORTUNISTIC
-- AI akan lebih agresif
-- Take opportunities yang player lewatkan
+AI Strategy: OPPORTUNISTIC
+- AI will be more aggressive
+- Take opportunities player misses
 - Faster game pace
 ```
 
-### 💾 Data Storage
+### Data Storage
 
 #### File: `gameStyle.json`
-Data player style disimpan dalam format JSON dengan struktur:
+Player style data stored in JSON format with structure:
 
 ```json
 {
@@ -381,11 +445,11 @@ Data player style disimpan dalam format JSON dengan struktur:
 ```
 
 #### localStorage
-Data juga otomatis disimpan di browser localStorage dengan key `buracoPlayerStyle`.
+Data is also automatically saved in browser localStorage with key `buracoPlayerStyle`.
 
-### 🔧 Developer Functions
+### Developer Functions
 
-Tersedia beberapa functions untuk manage data:
+Several functions available to manage data:
 
 ```javascript
 // Download style data as JSON file
@@ -401,71 +465,71 @@ updateAIStrategy();
 getAIAdaptedThreshold(baseThreshold);
 ```
 
-### 📈 Confidence Level
+### Confidence Level
 
-AI perlu **minimal 20 moves** untuk mulai adapt strategi dengan confidence.
+AI needs **minimum 20 moves** to start adapting strategy with confidence.
 
-- **0-20 moves**: AI main balanced (default)
-- **20-100 moves**: AI mulai adapt (confidence 20-100%)
-- **100+ moves**: AI fully adapted dengan high confidence
+- **0-20 moves**: AI plays balanced (default)
+- **20-100 moves**: AI starts adapting (confidence 20-100%)
+- **100+ moves**: AI fully adapted with high confidence
 
-### 🔒 Privacy & Security
+### Privacy & Security
 
-- ✅ **100% Local**: Semua data disimpan di browser Anda
-- ✅ **No Server**: Tidak ada data yang dikirim ke server
-- ✅ **No Tracking**: Tidak ada analytics atau tracking external
-- ✅ **Full Control**: Anda bisa reset atau download data kapan saja
-- ✅ **Open Source**: Kode bisa di-review di GitHub
+- **100% Local**: All data stored in your browser
+- **No Server**: No data sent to server
+- **No Tracking**: No external analytics or tracking
+- **Full Control**: You can reset or download data anytime
+- **Open Source**: Code can be reviewed on GitHub
 
-### 🎯 Cara Menggunakan
+### How to Use
 
-1. **Automatic Tracking**: Sistem otomatis melacak setiap move Anda
-2. **Play Normally**: Main seperti biasa, AI akan belajar
-3. **Watch AI Adapt**: Perhatikan console untuk melihat strategy changes
-4. **Review Stats**: Lihat statistics Anda di localStorage
-5. **Export Data**: Download JSON file untuk backup/analysis
+1. **Automatic Tracking**: System automatically tracks every move you make
+2. **Play Normally**: Play as usual, AI will learn
+3. **Watch AI Adapt**: Check console to see strategy changes
+4. **Review Stats**: View your statistics in localStorage
+5. **Export Data**: Download JSON file for backup/analysis
 
-### 🔬 Advanced: Console Monitoring
+### Advanced: Console Monitoring
 
-Buka browser console (F12) untuk melihat:
-- ✅ Load confirmations
-- 💾 Save notifications  
-- 🤖 AI strategy changes
-- 📊 Pattern detections
+Open browser console (F12) to see:
+- Load confirmations
+- Save notifications  
+- AI strategy changes
+- Pattern detections
 
 Example logs:
 ```
-✅ Loaded player style data: {...}
-💾 Saved player style data
-🤖 AI Strategy: DEFENSIVE (counter aggressive + risky player)
+Loaded player style data: {...}
+Saved player style data
+AI Strategy: DEFENSIVE (counter aggressive + risky player)
 ```
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
-Kontribusi sangat diterima! Silakan:
+Contributions are welcome! Please:
 1. Fork repository
 2. Create feature branch (`git checkout -b feature/AmazingFeature`)
 3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to branch (`git push origin feature/AmazingFeature`)
 5. Open Pull Request
 
-## 📝 License
+## License
 
 MIT License - feel free to use for personal or educational purposes.
 
-## 👨‍💻 Author
+## Author
 
 **Alfi Firdaus**
 - GitHub: [@masalfi](https://github.com/masalfi)
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
-- Aturan Buraco berdasarkan permainan tradisional Brasil/Italia
-- Desain terinspirasi dari meja kasino nyata
-- Community feedback untuk improvement
+- Buraco rules based on traditional Brazilian/Italian game
+- Design inspired by real casino tables
+- Community feedback for improvement
 
 ---
 
-**Selamat Bermain! Semoga beruntung membuat banyak Buraco! 🎉🃏**
+**Have fun playing! Good luck creating many Buracos!**

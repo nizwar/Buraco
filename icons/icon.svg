@@ -1,0 +1,24 @@
+<!-- This is a placeholder SVG icon for the Buraco PWA -->
+<!-- Convert this to PNG files of various sizes for production -->
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#1a4d2e" rx="64"/>
+  
+  <!-- Card background -->
+  <rect x="128" y="128" width="256" height="256" fill="#ffffff" rx="24" stroke="#ffd700" stroke-width="4"/>
+  
+  <!-- Spade symbol -->
+  <path d="M256 180 L280 220 L232 220 Z" fill="#000000"/>
+  <ellipse cx="256" cy="235" rx="24" ry="15" fill="#000000"/>
+  <rect x="252" y="240" width="8" height="20" fill="#000000"/>
+  
+  <!-- Card corner -->
+  <text x="140" y="160" font-family="serif" font-size="24" font-weight="bold" fill="#000000">B</text>
+  
+  <!-- Gold accent -->
+  <circle cx="256" cy="320" r="40" fill="none" stroke="#ffd700" stroke-width="6"/>
+  <text x="246" y="330" font-family="serif" font-size="20" font-weight="bold" fill="#ffd700">7+</text>
+  
+  <!-- App name -->
+  <text x="256" y="440" font-family="serif" font-size="32" font-weight="bold" fill="#ffd700" text-anchor="middle">BURACO</text>
+</svg>

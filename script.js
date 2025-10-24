@@ -170,7 +170,7 @@ async function initGame(newGame = true, playerCount = 2) {
     shuffleDeck();
     await dealCards();
     updateUI();
-    updateStatus('Giliran Anda! Ambil kartu dari deck atau tumpukan buang.');
+    updateStatus('Your turn! Draw card from deck or discard pile.');
     enableButtons();
 }
 
@@ -223,7 +223,7 @@ async function dealCards() {
     gameState.isDealing = true;
     const dealingStatus = document.getElementById('dealingStatus');
     dealingStatus.style.display = 'block';
-    dealingStatus.textContent = '🎴 Membagikan kartu...';
+    dealingStatus.textContent = 'Dealing cards...';
     
     // Disable all buttons during dealing
     document.getElementById('startBtn').disabled = true;
@@ -244,7 +244,7 @@ async function dealCards() {
         }
     }
     
-    dealingStatus.textContent = '🎁 Membuat pot...';
+    dealingStatus.textContent = 'Creating pots...';
     await sleep(500);
     
     // Create separate pots (11 cards for each player)
@@ -257,7 +257,7 @@ async function dealCards() {
     // First discard
     gameState.discardPile.push(gameState.deck.pop());
     
-    dealingStatus.textContent = '✅ Selesai! Selamat bermain!';
+    dealingStatus.textContent = 'Finished! Have fun playing!';
     await sleep(1000);
     dealingStatus.style.display = 'none';
     gameState.isDealing = false;
@@ -287,17 +287,17 @@ function drawCard() {
             gameState.playerHand.push(card);
             gameState.hasDrawn = true;
             
-            // 📊 Track player draw choice
+            // Track player draw choice
             trackDrawChoice(false);
             
             updateUI();
-            updateStatus('Kartu diambil! Sekarang buat kombinasi atau buang kartu.');
+            updateStatus('Card drawn! Now create combinations or discard card.');
             document.getElementById('drawBtn').disabled = true;
             document.getElementById('meldBtn').disabled = false;
             document.getElementById('addToMeldBtn').disabled = false;
             document.getElementById('discardBtn').disabled = false;
         } else {
-            updateStatus('Deck habis! Ambil pot jika belum diambil.');
+            updateStatus('Deck empty! Take pot if not taken yet.');
         }
     }
 }
@@ -311,11 +311,11 @@ function takeFromDiscard() {
         gameState.discardPile = [];
         gameState.hasDrawn = true;
         
-        // 📊 Track player draw choice
+        // Track player draw choice
         trackDrawChoice(true);
         
         updateUI();
-        updateStatus(`${takenCards.length} kartu dari tumpukan buang diambil! Buat kombinasi atau buang kartu.`);
+        updateStatus(`${takenCards.length} cards from discard pile taken! Create combinations or discard card.`);
         document.getElementById('drawBtn').disabled = true;
         document.getElementById('meldBtn').disabled = false;
         document.getElementById('addToMeldBtn').disabled = false;
@@ -332,7 +332,7 @@ function takePot() {
         gameState.playerUsedPot = true;
         gameState.hasDrawn = false;
         updateUI();
-        updateStatus('Pot Anda diambil! Lanjutkan permainan.');
+        updateStatus('Your pot taken! Continue playing.');
         document.getElementById('takePotBtn').disabled = true;
         enableButtons();
     }
@@ -352,7 +352,7 @@ function toggleCardSelection(index) {
 // Make Meld
 function makeMeld() {
     if (gameState.selectedCards.length < 3) {
-        updateStatus('Pilih minimal 3 kartu untuk membuat kombinasi!');
+        updateStatus('Select at least 3 cards to create combination!');
         return;
     }
     
@@ -387,10 +387,10 @@ function makeMeld() {
         gameState.playerScore += meldPoints;
         gameState.selectedCards = [];
         
-        // 📊 Track player meld creation
+        // Track player meld creation
         trackMeldCreation(meld);
         
-        // 📊 Track Buraco if created
+        // Track Buraco if created
         if (meld.length >= 7) {
             const hasWild = meld.some(c => c.isWild);
             trackBuracoCreation(!hasWild);
@@ -400,9 +400,9 @@ function makeMeld() {
         }
         
         updateUI();
-        updateStatus('Kombinasi berhasil dibuat! ' + getMeldDescription(meld) + ` +${meldPoints} poin!`);
+        updateStatus('Combination created successfully! ' + getMeldDescription(meld) + ` +${meldPoints} points!`);
     } else {
-        updateStatus('Kombinasi tidak valid! Harus 3+ kartu berurutan atau sama.');
+        updateStatus('Invalid combination! Must be 3+ consecutive or same cards.');
     }
 }
 
@@ -458,12 +458,12 @@ function getMeldDescription(meld) {
     
     if (meld.length >= 7) {
         if (isClean) {
-            return '🎉 BURACO! (Clean Run) +200 poin bonus!';
+            return 'BURACO! (Clean Run) +200 bonus points!';
         } else {
-            return '✨ Dirty Run (7+ kartu dengan wild) +100 poin bonus!';
+            return 'Dirty Run (7+ cards with wild) +100 bonus points!';
         }
     }
-    return 'Kombinasi valid!';
+        return 'Valid combination!';
 }
 
 // Discard Card
@@ -471,7 +471,7 @@ function discardCard(index) {
     if (gameState.hasDrawn) {
         const card = gameState.playerHand.splice(index, 1)[0];
         
-        // 📊 Track player discard choice
+        // Track player discard choice
         trackDiscardChoice(card);
         
         gameState.discardPile.push(card);
@@ -489,7 +489,7 @@ function discardCard(index) {
                     endRound();
                     return;
                 } else {
-                    updateStatus('ERROR: Tidak bisa menghabiskan kartu tanpa Buraco!');
+                    updateStatus('ERROR: Cannot exhaust cards without Buraco!');
                     gameState.playerHand.push(card);
                     gameState.discardPile.pop();
                     gameState.hasDrawn = true;
@@ -500,7 +500,7 @@ function discardCard(index) {
         }
         
         updateUI();
-        updateStatus('Giliran komputer...');
+        updateStatus('Computer turn...');
         document.getElementById('drawBtn').disabled = true;
         document.getElementById('meldBtn').disabled = true;
         document.getElementById('addToMeldBtn').disabled = true;
@@ -508,7 +508,7 @@ function discardCard(index) {
         
         setTimeout(computerTurn, 1500);
     } else {
-        updateStatus('Ambil kartu terlebih dahulu!');
+        updateStatus('Draw card first!');
     }
 }
 
@@ -522,7 +522,7 @@ function computerTurn() {
     if (shouldTakeDiscard && gameState.discardPile.length > 0) {
         // Take entire discard pile
         gameState.computerHand.push(...gameState.discardPile);
-        updateStatus('Komputer mengambil seluruh tumpukan buang! 📥');
+        updateStatus('Computer takes entire discard pile!');
         gameState.discardPile = [];
         updateUI();
     } else {
@@ -542,7 +542,7 @@ function computerTurn() {
     const meldsAfter = gameState.computerMelds.length;
     
     if (meldsAfter > meldsBefore) {
-        updateStatus('💡 Komputer membuat kombinasi baru!');
+        updateStatus('Computer creates new combination!');
         updateUI();
         setTimeout(() => {}, 500);
     }
@@ -553,7 +553,7 @@ function computerTurn() {
     const cardsAfter = gameState.computerHand.length;
     
     if (cardsAfter < cardsBefore) {
-        updateStatus('➕ Komputer menambahkan kartu ke kombinasi!');
+        updateStatus('Computer adds card to combination!');
         updateUI();
         setTimeout(() => {}, 500);
     }
@@ -565,7 +565,7 @@ function computerTurn() {
         gameState.discardPile.push(gameState.computerHand.splice(discardIndex, 1)[0]);
         
         if (discardedCard.points >= 15) {
-            updateStatus(`🎯 Komputer membuang ${discardedCard.displayValue} (${discardedCard.points} poin)`);
+            updateStatus(`Computer discards ${discardedCard.displayValue} (${discardedCard.points} points)`);
         }
     }
     
@@ -585,7 +585,7 @@ function computerTurn() {
     
     gameState.currentTurn = 'player';
     updateUI();
-    updateStatus('Giliran Anda! Ambil kartu dari deck atau tumpukan buang.');
+    updateStatus('Your turn! Draw card from deck or discard pile.');
     enableButtons();
 }
 
@@ -596,7 +596,7 @@ function computerShouldTakeDiscardPile() {
     const topCard = gameState.discardPile[gameState.discardPile.length - 1];
     const pileSize = gameState.discardPile.length;
     
-    // 🤖 Get AI-adapted thresholds based on player style
+    // Get AI-adapted thresholds based on player style
     const baseThreshold80 = getAIAdaptedThreshold(80);
     const baseThreshold60 = getAIAdaptedThreshold(60);
     const baseThreshold40 = getAIAdaptedThreshold(40);
@@ -967,23 +967,23 @@ function endRound() {
     
     updateUI();
     
-    let message = `🏁 Ronde ${gameState.roundNumber} Selesai!\n\n`;
+    let message = `Round ${gameState.roundNumber} Complete!\n\n`;
     message += `━━━━━━━━━━━━━━━━━━━━━\n`;
-    message += `📊 ANDA:\n`;
-    message += `  Poin dari kombinasi: +${gameState.playerRoundScore}\n`;
+    message += `PLAYER:\n`;
+    message += `  Points from combinations: +${gameState.playerRoundScore}\n`;
     if (playerPenalty > 0) {
-        message += `  Penalti kartu tersisa: -${playerPenalty}\n`;
+        message += `  Penalty for remaining cards: -${playerPenalty}\n`;
     }
-    message += `  Poin ronde ini: ${playerFinalRoundScore > 0 ? '+' : ''}${playerFinalRoundScore}\n`;
-    message += `  Total Skor: ${gameState.playerScore}\n\n`;
+    message += `  Round points: ${playerFinalRoundScore > 0 ? '+' : ''}${playerFinalRoundScore}\n`;
+    message += `  Total Score: ${gameState.playerScore}\n\n`;
     
-    message += `💻 KOMPUTER:\n`;
-    message += `  Poin dari kombinasi: +${gameState.computerRoundScore}\n`;
+    message += `COMPUTER:\n`;
+    message += `  Points from combinations: +${gameState.computerRoundScore}\n`;
     if (computerPenalty > 0) {
-        message += `  Penalti kartu tersisa: -${computerPenalty}\n`;
+        message += `  Penalty for remaining cards: -${computerPenalty}\n`;
     }
-    message += `  Poin ronde ini: ${computerFinalRoundScore > 0 ? '+' : ''}${computerFinalRoundScore}\n`;
-    message += `  Total Skor: ${gameState.computerScore}\n`;
+    message += `  Round points: ${computerFinalRoundScore > 0 ? '+' : ''}${computerFinalRoundScore}\n`;
+    message += `  Total Score: ${gameState.computerScore}\n`;
     message += `━━━━━━━━━━━━━━━━━━━━━\n\n`;
     
     // Check if game is won
@@ -991,40 +991,40 @@ function endRound() {
         const playerWon = gameState.playerScore > gameState.computerScore;
         const isDraw = gameState.playerScore === gameState.computerScore;
         
-        // 📊 Track game result
+        // Track game result
         trackGameResult(playerWon, gameState.playerScore);
         
         if (playerWon) {
-            message += `🎉🎊 ANDA MENANG GAME! 🎊🎉\n`;
+            message += `YOU WIN THE GAME!\n`;
             message += `Skor Akhir: ${gameState.playerScore} vs ${gameState.computerScore}`;
         } else if (!isDraw) {
-            message += `💻 Komputer Menang Game!\n`;
+            message += `Computer Wins Game!\n`;
             message += `Skor Akhir: ${gameState.computerScore} vs ${gameState.playerScore}`;
         } else {
-            message += `🤝 SERI! Game berakhir imbang!\n`;
+            message += `DRAW! Game ends in a tie!\n`;
             message += `Skor Akhir: ${gameState.playerScore} - ${gameState.computerScore}`;
         }
         
         setTimeout(() => {
             alert(message);
-            if (confirm('Mulai game baru?')) {
+            if (confirm('Start new game?')) {
                 initGame(true); // New game, reset all scores
             }
         }, 500);
     } else {
         // Continue to next round
-        message += `Target: ${gameState.targetScore} poin\n`;
+        message += `Target: ${gameState.targetScore} points\n`;
         if (gameState.playerScore > gameState.computerScore) {
-            message += `� Anda memimpin!\n`;
+            message += `You are leading!\n`;
         } else if (gameState.computerScore > gameState.playerScore) {
-            message += `Komputer memimpin!\n`;
+            message += `Computer is leading!\n`;
         } else {
-            message += `Skor seri!\n`;
+            message += `Tied score!\n`;
         }
         
         setTimeout(() => {
             alert(message);
-            if (confirm('Lanjut ke ronde berikutnya?')) {
+            if (confirm('Continue to next round?')) {
                 gameState.roundNumber++;
                 initGame(false); // Keep scores
             }
@@ -1221,17 +1221,17 @@ document.getElementById('discardBtn').addEventListener('click', () => {
     if (gameState.selectedCards.length === 1) {
         discardCard(gameState.selectedCards[0]);
     } else {
-        updateStatus('Pilih 1 kartu untuk dibuang!');
+        updateStatus('Select 1 card to discard!');
     }
 });
 document.getElementById('takePotBtn').addEventListener('click', takePot);
 document.getElementById('addToMeldBtn').addEventListener('click', () => {
     if (gameState.playerMelds.length === 0) {
-        updateStatus('Belum ada kombinasi untuk ditambahi!');
+        updateStatus('No combinations to add to!');
         return;
     }
     if (gameState.selectedCards.length === 0) {
-        updateStatus('Pilih kartu yang ingin ditambahkan!');
+        updateStatus('Select cards to add!');
         return;
     }
     // For simplicity, add to first valid meld found
@@ -1245,7 +1245,7 @@ document.getElementById('addToMeldBtn').addEventListener('click', () => {
             return;
         }
     }
-    updateStatus('Kartu tidak bisa ditambahkan ke kombinasi manapun!');
+    updateStatus('Card cannot be added to any combination!');
 });
 
 // AI Learning Controls
@@ -1328,8 +1328,14 @@ function loadPlayerStyle() {
 function savePlayerStyle() {
     playerStyleData.lastUpdated = new Date().toISOString().split('T')[0];
     
-    // Save to localStorage
-    localStorage.setItem('buracoPlayerStyle', JSON.stringify(playerStyleData));
+    // Save with PWA support (includes background sync)
+    if (typeof savePlayerStyleDataPWA === 'function') {
+        savePlayerStyleDataPWA(playerStyleData);
+    } else {
+        // Fallback to regular localStorage
+        localStorage.setItem('buracoPlayerStyle', JSON.stringify(playerStyleData));
+        console.log('💾 Saved to localStorage');
+    }
     
     // Display current state in console for debugging
     console.log('💾 Saved to localStorage');
@@ -1344,7 +1350,7 @@ function savePlayerStyle() {
     
     // Show notification every 10 moves
     if (playerStyleData.playerProfile.totalMoves % 10 === 0 && playerStyleData.playerProfile.totalMoves > 0) {
-        updateStatus(`📊 AI sedang mempelajari style Anda... (${playerStyleData.playerProfile.totalMoves} moves analyzed)`);
+        updateStatus(`AI is learning your style... (${playerStyleData.playerProfile.totalMoves} moves analyzed)`);
     }
 }
 
@@ -1629,7 +1635,7 @@ function showPlayerStats() {
     
     const riskValue = profile.style.riskTolerance;
     document.getElementById('riskLabel').textContent = 
-        riskValue > 65 ? '(Risky 🎲)' : riskValue < 35 ? '(Cautious 🎯)' : '(Moderate 📊)';
+        riskValue > 65 ? '(Risky)' : riskValue < 35 ? '(Cautious)' : '(Moderate)';
     
     const speedValue = profile.style.meldSpeed;
     document.getElementById('speedLabel').textContent = 
@@ -1679,7 +1685,247 @@ function resetPlayerStyle() {
             statistics: { wins: 0, losses: 0, draws: 0, avgScore: 0, highestScore: 0, totalBuracosCreated: 0, cleanBuracosCreated: 0, dirtyBuracosCreated: 0 }
         };
         console.log('🔄 Player style data reset');
-        updateStatus('✅ Data pembelajaran AI telah direset! gameStyle.json kembali ke default.');
-        alert('Data AI telah direset!\n\nSilakan download gameStyle.json yang baru untuk replace file yang lama.');
+        updateStatus('AI learning data has been reset! gameStyle.json back to default.');
+        alert('AI data has been reset!\n\nPlease download the new gameStyle.json to replace the old file.');
     }
 }
+
+// =============================================
+// PWA (Progressive Web App) Support
+// =============================================
+
+let deferredPrompt;
+let installButton;
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(registration => {
+                console.log('✅ PWA: Service Worker registered successfully:', registration.scope);
+                
+                // Check for updates
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            console.log('🔄 PWA: New version available! Please refresh to update.');
+                            showUpdateNotification();
+                        }
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('❌ PWA: Service Worker registration failed:', error);
+            });
+    });
+}
+
+// Handle PWA installation
+window.addEventListener('beforeinstallprompt', (event) => {
+    console.log('💾 PWA: Install prompt triggered');
+    event.preventDefault();
+    deferredPrompt = event;
+    showInstallButton();
+});
+
+// Show install button
+function showInstallButton() {
+    if (!installButton) {
+        installButton = document.createElement('button');
+        installButton.textContent = 'Install App';
+        installButton.className = 'btn install-btn';
+        installButton.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #1a4d2e;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+            transition: all 0.3s ease;
+        `;
+        
+        installButton.addEventListener('click', installPWA);
+        installButton.addEventListener('mouseenter', () => {
+            installButton.style.transform = 'translateY(-2px)';
+            installButton.style.boxShadow = '0 6px 16px rgba(255, 215, 0, 0.4)';
+        });
+        installButton.addEventListener('mouseleave', () => {
+            installButton.style.transform = 'translateY(0)';
+            installButton.style.boxShadow = '0 4px 12px rgba(255, 215, 0, 0.3)';
+        });
+        
+        document.body.appendChild(installButton);
+    }
+}
+
+// Install PWA
+async function installPWA() {
+    if (!deferredPrompt) return;
+    
+    console.log('🚀 PWA: Installing app...');
+    deferredPrompt.prompt();
+    
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`👤 PWA: User choice: ${outcome}`);
+    
+    if (outcome === 'accepted') {
+        console.log('✅ PWA: App installed successfully');
+        updateStatus('App installed successfully! You can now use Buraco offline.');
+    } else {
+        console.log('❌ PWA: App installation declined');
+    }
+    
+    deferredPrompt = null;
+    if (installButton) {
+        installButton.remove();
+        installButton = null;
+    }
+}
+
+// Show update notification
+function showUpdateNotification() {
+    const notification = document.createElement('div');
+    notification.innerHTML = `
+        <div style="
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 215, 0, 0.95);
+            color: #1a4d2e;
+            padding: 15px 25px;
+            border-radius: 10px;
+            z-index: 10001;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            font-weight: bold;
+            max-width: 300px;
+            text-align: center;
+        ">
+            🔄 New version available!
+            <br>
+            <button onclick="window.location.reload()" style="
+                margin-top: 10px;
+                background: #1a4d2e;
+                color: #ffd700;
+                border: none;
+                padding: 8px 15px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: bold;
+            ">
+                Update Now
+            </button>
+            <button onclick="this.parentElement.parentElement.remove()" style="
+                margin-top: 10px;
+                margin-left: 10px;
+                background: transparent;
+                color: #1a4d2e;
+                border: 1px solid #1a4d2e;
+                padding: 8px 15px;
+                border-radius: 5px;
+                cursor: pointer;
+            ">
+                Later
+            </button>
+        </div>
+    `;
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 10 seconds
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.remove();
+        }
+    }, 10000);
+}
+
+// Handle app installed event
+window.addEventListener('appinstalled', () => {
+    console.log('PWA: App installed via browser');
+    updateStatus('Welcome! Buraco is now installed on your device.');
+    
+    // Hide install button if still visible
+    if (installButton) {
+        installButton.remove();
+        installButton = null;
+    }
+});
+
+// Handle online/offline status
+window.addEventListener('online', () => {
+    console.log('🌐 PWA: Back online');
+    updateStatus('Connection restored! All features available.');
+});
+
+window.addEventListener('offline', () => {
+    console.log('📴 PWA: Gone offline');
+    updateStatus('You are offline. Game continues with cached data.');
+});
+
+// Enhanced localStorage save with background sync
+function savePlayerStyleDataPWA(data) {
+    try {
+        // Save to localStorage as usual
+        localStorage.setItem('buracoPlayerStyle', JSON.stringify(data));
+        console.log('💾 PWA: Player style data saved locally');
+        
+        // Request background sync if service worker supports it
+        if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
+            navigator.serviceWorker.ready.then(registration => {
+                return registration.sync.register('save-game-data');
+            }).then(() => {
+                console.log('🔄 PWA: Background sync registered for game data');
+            }).catch(error => {
+                console.warn('⚠️ PWA: Background sync not supported:', error);
+            });
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('❌ PWA: Failed to save player style data:', error);
+        return false;
+    }
+}
+
+// Check if app is running as PWA
+function isPWA() {
+    return window.matchMedia('(display-mode: standalone)').matches || 
+           window.navigator.standalone === true;
+}
+
+// PWA-specific UI adjustments
+function initPWAFeatures() {
+    if (isPWA()) {
+        console.log('📱 PWA: Running as installed app');
+        document.body.classList.add('pwa-mode');
+        
+        // Add PWA-specific styles
+        const pwaStyles = document.createElement('style');
+        pwaStyles.textContent = `
+            .pwa-mode {
+                padding-top: env(safe-area-inset-top);
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+            
+            .pwa-mode .container {
+                padding-top: max(20px, env(safe-area-inset-top));
+            }
+        `;
+        document.head.appendChild(pwaStyles);
+    }
+    
+    // Show offline indicator if offline
+    if (!navigator.onLine) {
+        updateStatus('You are offline. Game continues with cached data.');
+    }
+}
+
+// Initialize PWA features when DOM is loaded
+document.addEventListener('DOMContentLoaded', initPWAFeatures);

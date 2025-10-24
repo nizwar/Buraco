@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Icon Generator for Buraco PWA</title>
+</head>
+<body>
+    <h1>PWA Icon Generator</h1>
+    <p>Click the button below to generate and download icons:</p>
+    <button onclick="generateAllIcons()">Generate Icons</button>
+    <div id="downloads"></div>
+
+    <script>
+        function generateIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#1a4d2e');
+            gradient.addColorStop(1, '#2d5f3f');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Add rounded corners
+            ctx.globalCompositeOperation = 'destination-in';
+            ctx.beginPath();
+            ctx.roundRect(0, 0, size, size, size * 0.125);
+            ctx.fill();
+            ctx.globalCompositeOperation = 'source-over';
+            
+            // Card background
+            const cardSize = size * 0.7;
+            const cardX = (size - cardSize) / 2;
+            const cardY = (size - cardSize) / 2;
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.roundRect(cardX, cardY, cardSize, cardSize, size * 0.04);
+            ctx.fill();
+            
+            // Card border
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = size * 0.008;
+            ctx.beginPath();
+            ctx.roundRect(cardX, cardY, cardSize, cardSize, size * 0.04);
+            ctx.stroke();
+            
+            // Spade symbol
+            ctx.fillStyle = '#000000';
+            const centerX = size / 2;
+            const centerY = size / 2 - size * 0.05;
+            const spadeSize = size * 0.1;
+            
+            // Draw spade
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY - spadeSize);
+            ctx.bezierCurveTo(
+                centerX - spadeSize, centerY - spadeSize/2,
+                centerX - spadeSize, centerY + spadeSize/2,
+                centerX, centerY + spadeSize/3
+            );
+            ctx.bezierCurveTo(
+                centerX + spadeSize, centerY + spadeSize/2,
+                centerX + spadeSize, centerY - spadeSize/2,
+                centerX, centerY - spadeSize
+            );
+            ctx.fill();
+            
+            // Spade stem
+            ctx.fillRect(centerX - size * 0.01, centerY + spadeSize/3, size * 0.02, size * 0.04);
+            
+            // Number 7+
+            ctx.fillStyle = '#ffd700';
+            ctx.font = `bold ${size * 0.08}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText('7+', centerX, centerY + spadeSize * 1.8);
+            
+            // App name
+            ctx.fillStyle = '#ffd700';
+            ctx.font = `bold ${size * 0.09}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText('BURACO', centerX, size - size * 0.1);
+            
+            return canvas.toDataURL('image/png');
+        }
+
+        function downloadIcon(dataUrl, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = dataUrl;
+            link.click();
+        }
+
+        function generateAllIcons() {
+            const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+            const downloads = document.getElementById('downloads');
+            downloads.innerHTML = '<h3>Generating icons...</h3>';
+            
+            sizes.forEach((size, index) => {
+                setTimeout(() => {
+                    const iconData = generateIcon(size);
+                    downloadIcon(iconData, `icon-${size}x${size}.png`);
+                    
+                    const status = document.createElement('p');
+                    status.textContent = `✓ Generated icon-${size}x${size}.png`;
+                    downloads.appendChild(status);
+                    
+                    if (index === sizes.length - 1) {
+                        const complete = document.createElement('h3');
+                        complete.textContent = 'All icons generated! Check your downloads folder.';
+                        complete.style.color = 'green';
+                        downloads.appendChild(complete);
+                    }
+                }, index * 100);
+            });
+        }
+    </script>
+</body>
+</html>

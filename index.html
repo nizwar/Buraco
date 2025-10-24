@@ -1,92 +1,112 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Authentic digital Buraco card game with smart AI and learning system">
+    <meta name="theme-color" content="#ffd700">
     <title>Buraco</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- PWA Icons for iOS -->
+    <link rel="apple-touch-icon" sizes="72x72" href="icons/icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="96x96" href="icons/icon-96x96.png">
+    <link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128x128.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192x192.png">
+    
+    <!-- iOS specific meta tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Buraco">
+    
+    <!-- Windows specific meta tags -->
+    <meta name="msapplication-TileImage" content="icons/icon-144x144.png">
+    <meta name="msapplication-TileColor" content="#1a4d2e">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🃏 BURACO 🃏</h1>
+            <h1>BURACO</h1>
         </header>
 
         <div class="game-info">
             <div class="score-board">
                 <div class="player-score">
-                    <h3>Pemain</h3>
+                    <h3>Player</h3>
                     <p class="score" id="playerScore">0</p>
                 </div>
                 <div class="round-info" style="text-align: center;">
-                    <h3 style="color: #ffd700; margin-bottom: 5px;">Ronde <span id="roundNumber">1</span></h3>
+                    <h3 style="color: #ffd700; margin-bottom: 5px;">Round <span id="roundNumber">1</span></h3>
                     <p style="color: #fff; font-size: 0.9em;">Target: <span id="targetScore">2000</span></p>
                 </div>
                 <div class="player-score">
-                    <h3>Komputer</h3>
+                    <h3>Computer</h3>
                     <p class="score" id="computerScore">0</p>
                 </div>
             </div>
-            <button id="tutorialBtn" class="tutorial-btn">📖 Lihat Tutorial</button>
+            <button id="tutorialBtn" class="tutorial-btn">View Tutorial</button>
         </div>
 
         <div class="game-board">
-            <!-- Area Komputer -->
+            <!-- Computer Area -->
             <div class="opponent-area">
-                <h3>Kartu Komputer</h3>
+                <h3>Computer Cards</h3>
                 <div id="computerHand" class="hand"></div>
                 <div id="computerMelds" class="melds-area">
-                    <p class="meld-label">Kombinasi Komputer:</p>
+                    <p class="meld-label">Computer Combinations:</p>
                 </div>
             </div>
 
-            <!-- Area Tengah (Tumpukan) -->
+            <!-- Center Area (Piles) -->
             <div class="center-area">
                 <div class="pile-container">
                     <div class="pile">
-                        <h4>Tumpukan Buang</h4>
+                        <h4>Discard Pile</h4>
                         <div id="discardPile" class="card-pile"></div>
                     </div>
                     <div class="pile">
                         <h4>Deck</h4>
                         <div id="drawPile" class="card-pile">
-                            <div class="card back">🂠</div>
+                            <div class="card back"></div>
                         </div>
                     </div>
                     <div class="pile">
                         <h4>Pot (Buraco)</h4>
                         <div id="potPile" class="card-pile">
-                            <div class="card back">🎁</div>
+                            <div class="card back"></div>
                         </div>
                     </div>
                 </div>
-                <div class="game-status" id="gameStatus">Klik "Mulai Game" untuk bermain</div>
+                <div class="game-status" id="gameStatus">Click "Start Game" to play</div>
             </div>
 
-            <!-- Area Pemain -->
+            <!-- Player Area -->
             <div class="player-area">
-                <h3>Kartu Anda</h3>
+                <h3>Your Cards</h3>
                 <div id="playerHand" class="hand"></div>
                 <div id="playerMelds" class="melds-area">
-                    <p class="meld-label">Kombinasi Anda:</p>
+                    <p class="meld-label">Your Combinations:</p>
                 </div>
             </div>
         </div>
 
         <div class="controls">
-            <button id="startBtn" class="btn btn-primary">🎮 Pilih Mode & Mulai</button>
-            <button id="drawBtn" class="btn" disabled>📥 Ambil Kartu</button>
-            <button id="meldBtn" class="btn" disabled>📋 Buat Kombinasi Baru</button>
-            <button id="addToMeldBtn" class="btn" disabled>➕ Tambah ke Kombinasi</button>
-            <button id="discardBtn" class="btn" disabled>🗑️ Buang Kartu</button>
-            <button id="takePotBtn" class="btn" disabled>🎁 Ambil Pot</button>
+            <button id="startBtn" class="btn btn-primary">Select Mode & Start</button>
+            <button id="drawBtn" class="btn" disabled>Draw Card</button>
+            <button id="meldBtn" class="btn" disabled>Create New Combination</button>
+            <button id="addToMeldBtn" class="btn" disabled>Add to Combination</button>
+            <button id="discardBtn" class="btn" disabled>Discard Card</button>
+            <button id="takePotBtn" class="btn" disabled>Take Pot</button>
         </div>
         
         <!-- AI Learning Controls -->
         <div class="controls" style="margin-top: 10px; border-top: 2px solid rgba(255,255,255,0.2); padding-top: 10px;">
-            <button id="viewStatsBtn" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">📊 Lihat Statistik AI</button>
-            <button id="downloadStyleBtn" class="btn" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">💾 Download gameStyle.json</button>
-            <button id="resetStyleBtn" class="btn" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">🔄 Reset Data AI</button>
+            <button id="viewStatsBtn" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">View AI Statistics</button>
+            <button id="downloadStyleBtn" class="btn" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">Download gameStyle.json</button>
+            <button id="resetStyleBtn" class="btn" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">Reset AI Data</button>
         </div>
     </div>
 
@@ -96,19 +116,19 @@
     <!-- Modal Player Selection -->
     <div id="playerSelectModal" class="modal" style="display: block;">
         <div class="modal-content" style="max-width: 500px;">
-            <h2>🎮 Pilih Mode Permainan</h2>
+            <h2>Select Game Mode</h2>
             <div class="player-selection">
                 <button id="select2Players" class="player-mode-btn">
-                    <span class="mode-icon">👥</span>
-                    <h3>2 Pemain</h3>
-                    <p>Anda vs Komputer</p>
-                    <small>Mode klasik untuk pemula</small>
+                    <span class="mode-icon">2P</span>
+                    <h3>2 Players</h3>
+                    <p>You vs Computer</p>
+                    <small>Classic mode for beginners</small>
                 </button>
                 <button id="select4Players" class="player-mode-btn">
-                    <span class="mode-icon">👥👥</span>
-                    <h3>4 Pemain</h3>
-                    <p>Tim 2 vs 2</p>
-                    <small>Anda + Partner vs 2 Komputer</small>
+                    <span class="mode-icon">4P</span>
+                    <h3>4 Players</h3>
+                    <p>Team 2 vs 2</p>
+                    <small>You + Partner vs 2 Computers</small>
                 </button>
             </div>
         </div>
@@ -118,84 +138,84 @@
     <div id="tutorialModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>📖 Cara Bermain Buraco</h2>
+            <h2>How to Play Buraco</h2>
             
             <div class="tutorial-section">
-                <h3>🎯 Tujuan Permainan</h3>
-                <p>Buraco adalah permainan kartu yang dimainkan dengan 2 deck standar (104 kartu + 4 joker). Tujuannya adalah membuat kombinasi kartu (sequences atau sets) dan menghabiskan semua kartu di tangan Anda.</p>
-                <p><strong>Mode Permainan:</strong></p>
+                <h3>Game Objective</h3>
+                <p>Buraco is a card game played with 2 standard decks (104 cards + 4 jokers). The goal is to create card combinations (sequences or sets) and exhaust all cards in your hand.</p>
+                <p><strong>Game Modes:</strong></p>
                 <ul>
-                    <li><strong>2 Pemain:</strong> Anda vs Komputer (klasik)</li>
-                    <li><strong>4 Pemain:</strong> Tim 2 vs 2 - Anda + Partner (Komputer 2) vs 2 Komputer lawan</li>
+                    <li><strong>2 Players:</strong> You vs Computer (classic)</li>
+                    <li><strong>4 Players:</strong> Team 2 vs 2 - You + Partner (Computer 2) vs 2 opposing Computers</li>
                 </ul>
             </div>
 
             <div class="tutorial-section">
-                <h3>🃏 Nilai Kartu</h3>
+                <h3>Card Values</h3>
                 <ul>
-                    <li><strong>Joker & 2:</strong> Kartu liar (wild card) - dapat menggantikan kartu apapun</li>
-                    <li><strong>A (As):</strong> 15 poin</li>
-                    <li><strong>K, Q, J, 10, 9, 8:</strong> 10 poin</li>
-                    <li><strong>7, 6, 5, 4, 3:</strong> 5 poin</li>
+                    <li><strong>Joker & 2:</strong> Wild cards - can replace any card</li>
+                    <li><strong>A (Ace):</strong> 15 points</li>
+                    <li><strong>K, Q, J, 10, 9, 8:</strong> 10 points</li>
+                    <li><strong>7, 6, 5, 4, 3:</strong> 5 points</li>
                 </ul>
             </div>
 
             <div class="tutorial-section">
-                <h3>🎮 Cara Bermain</h3>
+                <h3>How to Play</h3>
                 <ol>
-                    <li><strong>Awal Game:</strong> Setiap pemain mendapat 11 kartu. Setiap pemain juga punya "Pot" tersendiri (11 kartu tersembunyi) yang bisa diambil saat kartu habis.</li>
-                    <li><strong>Giliran:</strong>
+                    <li><strong>Game Start:</strong> Each player gets 11 cards. Each player also has their own "Pot" (11 hidden cards) that can be taken when cards run out.</li>
+                    <li><strong>Your Turn:</strong>
                         <ul>
-                            <li><strong>Ambil kartu:</strong> Dari deck ATAU ambil SELURUH tumpukan buang</li>
-                            <li><strong>Buat kombinasi:</strong> Opsional, minimal 3 kartu</li>
-                            <li><strong>Buang 1 kartu</strong> ke tumpukan buang</li>
+                            <li><strong>Draw card:</strong> From deck OR take ENTIRE discard pile</li>
+                            <li><strong>Create combinations:</strong> Optional, minimum 3 cards</li>
+                            <li><strong>Discard 1 card</strong> to discard pile</li>
                         </ul>
                     </li>
-                    <li><strong>Meld Pertama:</strong> Kombinasi pertama yang Anda buat harus bernilai <strong>minimal 50 poin!</strong></li>
-                    <li><strong>Kombinasi Valid:</strong>
+                    <li><strong>First Meld:</strong> Your first combination must be worth <strong>at least 50 points!</strong></li>
+                    <li><strong>Valid Combinations:</strong>
                         <ul>
-                            <li><strong>Sequence:</strong> 3+ kartu berurutan dengan lambang sama (contoh: 5♥ 6♥ 7♥)</li>
-                            <li><strong>Set:</strong> 3+ kartu dengan angka sama (contoh: 8♠ 8♥ 8♦)</li>
-                            <li>Minimal 3 kartu untuk membuat kombinasi</li>
-                            <li>Anda bisa menambahkan kartu ke kombinasi yang sudah ada</li>
+                            <li><strong>Sequence:</strong> 3+ consecutive cards of same suit (example: 5♥ 6♥ 7♥)</li>
+                            <li><strong>Set:</strong> 3+ cards of same number (example: 8♠ 8♥ 8♦)</li>
+                            <li>Minimum 3 cards to create a combination</li>
+                            <li>You can add cards to existing combinations</li>
                         </ul>
                     </li>
-                    <li><strong>Buraco (Clean Run):</strong> Kombinasi 7+ kartu tanpa kartu liar = bonus 200 poin!</li>
-                    <li><strong>Dirty Run:</strong> Kombinasi 7+ kartu dengan kartu liar = bonus 100 poin</li>
-                    <li><strong>Pot:</strong> Saat kartu Anda habis, pot Anda otomatis terbuka dan menjadi kartu tangan baru</li>
+                    <li><strong>Buraco (Clean Run):</strong> 7+ card combination without wild cards = 200 bonus points!</li>
+                    <li><strong>Dirty Run:</strong> 7+ card combination with wild cards = 100 bonus points</li>
+                    <li><strong>Pot:</strong> When your cards run out, your pot automatically opens and becomes your new hand</li>
                 </ol>
             </div>
 
             <div class="tutorial-section">
-                <h3>🏆 Cara Menang</h3>
-                <p><strong>Syarat Menang Ronde:</strong> Untuk menghabiskan kartu dan mengakhiri ronde, Anda HARUS memiliki minimal <strong>1 Buraco</strong> (kombinasi 7+ kartu)!</p>
-                <p><strong>Game Multi-Round:</strong> Game berlanjut sampai ada pemain yang mencapai <strong>2000 poin</strong>. Setiap ronde:</p>
+                <h3>How to Win</h3>
+                <p><strong>Round Win Condition:</strong> To exhaust cards and end the round, you MUST have at least <strong>1 Buraco</strong> (7+ card combination)!</p>
+                <p><strong>Multi-Round Game:</strong> Game continues until a player reaches <strong>2000 points</strong>. Each round:</p>
                 <ul>
-                    <li>Kombinasi kartu: +poin sesuai nilai kartu</li>
-                    <li>Buraco (clean run 7+ tanpa wild): +200 poin bonus</li>
-                    <li>Dirty run (7+ dengan wild card): +100 poin bonus</li>
-                    <li>Kartu tersisa di tangan: -poin (penalti)</li>
-                    <li>Pemain yang menghabiskan kartu duluan: tidak ada penalti</li>
+                    <li>Card combinations: +points according to card values</li>
+                    <li>Buraco (clean run 7+ without wild): +200 bonus points</li>
+                    <li>Dirty run (7+ with wild cards): +100 bonus points</li>
+                    <li>Remaining cards in hand: -points (penalty)</li>
+                    <li>Player who exhausts cards first: no penalty</li>
                 </ul>
-                <p><strong>Pemenang:</strong> Pemain dengan total skor tertinggi saat ada yang mencapai 2000 poin!</p>
+                <p><strong>Winner:</strong> Player with highest total score when someone reaches 2000 points!</p>
             </div>
 
             <div class="tutorial-section">
-                <h3>💡 Tips Bermain</h3>
+                <h3>Playing Tips</h3>
                 <ul>
-                    <li><strong>Prioritas utama:</strong> Buat minimal 1 Buraco untuk bisa menghabiskan kartu!</li>
-                    <li><strong>Meld pertama:</strong> Kumpulkan kartu sampai bisa membuat kombinasi 50+ poin</li>
-                    <li><strong>Ambil discard pile:</strong> Strategis karena Anda ambil SEMUA kartu, bisa jadi banyak!</li>
-                    <li>Fokus membuat sequences panjang untuk mendapat Buraco clean (200 poin)</li>
-                    <li>Gunakan Joker dan angka 2 secara strategis untuk melengkapi kombinasi</li>
-                    <li>Perhatikan kartu yang dibuang lawan</li>
-                    <li>Jangan terburu-buru menghabiskan kartu jika belum punya Buraco</li>
-                    <li>Buang kartu bernilai tinggi jika tidak bisa dikombinasikan</li>
-                    <li>Pot akan otomatis terbuka saat kartu habis - rencanakan dengan baik!</li>
+                    <li><strong>Top priority:</strong> Create at least 1 Buraco to be able to exhaust cards!</li>
+                    <li><strong>First meld:</strong> Collect cards until you can create 50+ point combinations</li>
+                    <li><strong>Take discard pile:</strong> Strategic because you take ALL cards, could be many!</li>
+                    <li>Focus on creating long sequences to get clean Buraco (200 points)</li>
+                    <li>Use Jokers and 2s strategically to complete combinations</li>
+                    <li>Pay attention to cards discarded by opponents</li>
+                    <li>Don't rush to exhaust cards if you don't have a Buraco yet</li>
+                    <li>Discard high-value cards if they can't be combined</li>
+                    <li>Pot will automatically open when cards run out - plan well!</li>
                 </ul>
             </div>
 
-            <button class="btn btn-primary close-tutorial">Mulai Bermain!</button>
+            <button class="btn btn-primary close-tutorial">Start Playing!</button>
         </div>
     </div>
 
@@ -203,10 +223,10 @@
     <div id="statsModal" class="modal">
         <div class="modal-content">
             <span class="close" id="closeStats">&times;</span>
-            <h2>📊 Statistik & AI Learning</h2>
+            <h2>Statistics & AI Learning</h2>
             
             <div class="tutorial-section">
-                <h3>🎮 Profil Pemain Anda</h3>
+                <h3>Your Player Profile</h3>
                 <div id="playerStyleInfo" style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin: 10px 0;">
                     <p><strong>Games Played:</strong> <span id="statGamesPlayed">0</span></p>
                     <p><strong>Total Moves:</strong> <span id="statTotalMoves">0</span></p>
@@ -215,7 +235,7 @@
             </div>
 
             <div class="tutorial-section">
-                <h3>🎯 Style Bermain Anda</h3>
+                <h3>Your Playing Style</h3>
                 <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin: 10px 0;">
                     <p><strong>Aggressiveness:</strong> <span id="statAggressiveness">50</span>/100 
                         <span id="aggLabel" style="font-size: 0.9em;"></span></p>
@@ -228,7 +248,7 @@
             </div>
 
             <div class="tutorial-section">
-                <h3>📈 Preferensi Kombinasi</h3>
+                <h3>Combination Preferences</h3>
                 <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin: 10px 0;">
                     <p><strong>Sequences Created:</strong> <span id="statSequences">0</span></p>
                     <p><strong>Sets Created:</strong> <span id="statSets">0</span></p>
@@ -237,7 +257,7 @@
             </div>
 
             <div class="tutorial-section">
-                <h3>🤖 AI Adaptation</h3>
+                <h3>AI Adaptation</h3>
                 <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin: 10px 0;">
                     <p><strong>Current AI Strategy:</strong> <span id="statAIStrategy" style="text-transform: uppercase; color: #ffd700;">BALANCED</span></p>
                     <p><strong>Adaptation Level:</strong> <span id="statAdaptationLevel">0</span>/100</p>
@@ -247,16 +267,16 @@
             </div>
 
             <div class="tutorial-section">
-                <h3>🏆 Achievements</h3>
+                <h3>Achievements</h3>
                 <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin: 10px 0;">
                     <p><strong>Total Buracos:</strong> <span id="statTotalBuracos">0</span></p>
-                    <p><strong>Clean Buracos:</strong> <span id="statCleanBuracos">0</span> 🎉</p>
-                    <p><strong>Dirty Runs:</strong> <span id="statDirtyRuns">0</span> ✨</p>
+                    <p><strong>Clean Buracos:</strong> <span id="statCleanBuracos">0</span></p>
+                    <p><strong>Dirty Runs:</strong> <span id="statDirtyRuns">0</span></p>
                     <p><strong>Highest Score:</strong> <span id="statHighestScore">0</span></p>
                 </div>
             </div>
 
-            <button class="btn btn-primary" id="closeStatsBtn">Tutup</button>
+            <button class="btn btn-primary" id="closeStatsBtn">Close</button>
         </div>
     </div>
 
