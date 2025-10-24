@@ -306,6 +306,7 @@ header p {
     justify-content: center;
     gap: 15px;
     flex-wrap: wrap;
+    margin: 20px 0;
 }
 
 .btn {
@@ -552,11 +553,25 @@ header p {
     }
     
     .controls {
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px;
+        padding: 0 10px;
+        margin: 15px 0;
     }
     
     .btn {
-        width: 100%;
+        padding: 12px 16px;
+        font-size: 0.95em;
+        border-radius: 8px;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     .player-selection {
@@ -750,18 +765,22 @@ header p {
     }
     
     .controls {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 10px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 8px;
         justify-content: center;
-        margin-top: 15px;
+        margin: 10px;
+        padding: 0 10px;
     }
     
     .btn {
-        padding: 10px 16px;
-        font-size: 0.9em;
-        min-width: 120px;
+        padding: 8px 12px;
+        font-size: 0.85em;
         border-radius: 6px;
+        min-height: 40px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     .modal-content {

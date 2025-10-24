@@ -1248,10 +1248,7 @@ document.getElementById('addToMeldBtn').addEventListener('click', () => {
     updateStatus('Card cannot be added to any combination!');
 });
 
-// AI Learning Controls
-document.getElementById('viewStatsBtn').addEventListener('click', showPlayerStats);
-document.getElementById('downloadStyleBtn').addEventListener('click', downloadPlayerStyle);
-document.getElementById('resetStyleBtn').addEventListener('click', resetPlayerStyle);
+
 
 // Tutorial Modal
 const modal = document.getElementById('tutorialModal');
@@ -1271,25 +1268,9 @@ closeTutorialBtn.onclick = () => {
     modal.style.display = 'none';
 };
 
-// Stats Modal
-const statsModal = document.getElementById('statsModal');
-const closeStats = document.getElementById('closeStats');
-const closeStatsBtn = document.getElementById('closeStatsBtn');
-
-closeStats.onclick = () => {
-    statsModal.style.display = 'none';
-};
-
-closeStatsBtn.onclick = () => {
-    statsModal.style.display = 'none';
-};
-
 window.onclick = (event) => {
     if (event.target === modal) {
         modal.style.display = 'none';
-    }
-    if (event.target === statsModal) {
-        statsModal.style.display = 'none';
     }
     if (event.target === document.getElementById('playerSelectModal')) {
         // Don't allow closing player select modal by clicking outside
@@ -1608,87 +1589,7 @@ function downloadPlayerStyle() {
     console.log('📥 Downloaded player style as JSON');
 }
 
-// Show player statistics modal
-function showPlayerStats() {
-    const profile = playerStyleData.playerProfile;
-    const stats = playerStyleData.statistics;
-    const ai = playerStyleData.aiAdaptation;
-    
-    // Basic stats
-    document.getElementById('statGamesPlayed').textContent = profile.gamesPlayed;
-    document.getElementById('statTotalMoves').textContent = profile.totalMoves;
-    
-    const totalGames = stats.wins + stats.losses + stats.draws;
-    const winRate = totalGames > 0 ? ((stats.wins / totalGames) * 100).toFixed(1) : 0;
-    document.getElementById('statWinRate').textContent = winRate + '%';
-    
-    // Style
-    document.getElementById('statAggressiveness').textContent = profile.style.aggressiveness.toFixed(1);
-    document.getElementById('statRiskTolerance').textContent = profile.style.riskTolerance.toFixed(1);
-    document.getElementById('statMeldSpeed').textContent = profile.style.meldSpeed.toFixed(1);
-    document.getElementById('statWildCardUsage').textContent = profile.style.wildCardUsage.toFixed(1);
-    
-    // Labels for style
-    const aggValue = profile.style.aggressiveness;
-    document.getElementById('aggLabel').textContent = 
-        aggValue > 65 ? '(Aggressive 🔥)' : aggValue < 35 ? '(Conservative 🛡️)' : '(Balanced ⚖️)';
-    
-    const riskValue = profile.style.riskTolerance;
-    document.getElementById('riskLabel').textContent = 
-        riskValue > 65 ? '(Risky)' : riskValue < 35 ? '(Cautious)' : '(Moderate)';
-    
-    const speedValue = profile.style.meldSpeed;
-    document.getElementById('speedLabel').textContent = 
-        speedValue > 65 ? '(Fast ⚡)' : speedValue < 35 ? '(Slow 🐢)' : '(Normal ⏱️)';
-    
-    // Preferences
-    document.getElementById('statSequences').textContent = profile.preferences.prefersSequences;
-    document.getElementById('statSets').textContent = profile.preferences.prefersSets;
-    document.getElementById('statAvgMeldSize').textContent = profile.patterns.avgMeldSize.toFixed(1);
-    
-    // AI Adaptation
-    document.getElementById('statAIStrategy').textContent = ai.currentStrategy;
-    document.getElementById('statAdaptationLevel').textContent = ai.adaptationLevel.toFixed(1);
-    document.getElementById('statConfidenceLevel').textContent = ai.learningProgress.confidenceLevel.toFixed(1);
-    document.getElementById('statPatternsDetected').textContent = ai.learningProgress.patternsDetected;
-    
-    // Achievements
-    document.getElementById('statTotalBuracos').textContent = stats.totalBuracosCreated;
-    document.getElementById('statCleanBuracos').textContent = stats.cleanBuracosCreated;
-    document.getElementById('statDirtyRuns').textContent = stats.dirtyBuracosCreated;
-    document.getElementById('statHighestScore').textContent = stats.highestScore;
-    
-    // Show modal
-    document.getElementById('statsModal').style.display = 'block';
-}
 
-// Reset player style data
-function resetPlayerStyle() {
-    if (confirm('Reset semua data pembelajaran AI? Ini akan menghapus semua history permainan Anda.')) {
-        playerStyleData = {
-            version: "1.0",
-            lastUpdated: new Date().toISOString().split('T')[0],
-            playerProfile: {
-                gamesPlayed: 0,
-                totalMoves: 0,
-                style: { aggressiveness: 50, riskTolerance: 50, meldSpeed: 50, wildCardUsage: 50 },
-                preferences: { prefersSequences: 0, prefersSets: 0, usesWildCardsEarly: 0, holdsForBigMelds: 0 },
-                patterns: { drawFromDiscard: 0, drawFromDeck: 0, avgMeldSize: 0, avgTurnsBeforeFirstMeld: 0, avgCardsInHandBeforeMeld: 0 },
-                discardPatterns: { highCards: 0, lowCards: 0, middleCards: 0, duplicates: 0, isolatedCards: 0 }
-            },
-            aiAdaptation: {
-                currentStrategy: "balanced",
-                adaptationLevel: 0,
-                counterStrategies: { againstAggressive: false, againstConservative: false, againstRisky: false, againstCautious: false },
-                learningProgress: { movesAnalyzed: 0, patternsDetected: 0, confidenceLevel: 0 }
-            },
-            statistics: { wins: 0, losses: 0, draws: 0, avgScore: 0, highestScore: 0, totalBuracosCreated: 0, cleanBuracosCreated: 0, dirtyBuracosCreated: 0 }
-        };
-        console.log('🔄 Player style data reset');
-        updateStatus('AI learning data has been reset! gameStyle.json back to default.');
-        alert('AI data has been reset!\n\nPlease download the new gameStyle.json to replace the old file.');
-    }
-}
 
 // =============================================
 // PWA (Progressive Web App) Support
@@ -1962,7 +1863,7 @@ function handleOrientationChange() {
         }
         
         // Force re-render of cards to adjust positioning
-        updateDisplay();
+        updateUI();
     }, 100);
 }
 
